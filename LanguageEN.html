@@ -1,0 +1,2751 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>NULLC Language reference</title>
+<style type="text/css">
+p.code
+{
+	background: #eee;
+	font-family: Consolas, Courier New, monospace;
+	font-size: 10pt;
+}
+span.code
+{
+	background: #eee;
+	font-family: Consolas, Courier New, monospace;
+	font-size: 10pt;
+}
+pre.code{ background: #eee; font-family: Consolas, Courier New, monospace; font-size: 10pt; }
+span.rword
+{
+	color: #00f;
+}
+span.func
+{
+	color: #880000;
+	font-style: italic;
+}
+span.var
+{
+	color: #555;
+}
+span.real 
+{
+	color: #008800;
+}
+span.comment
+{
+	color: #f0f;
+}
+span.string
+{
+	color: #880000;
+}
+span.vardef{color: #323232;}
+span.bold{font-weight: bold;}
+span.error{color: #f00;text-decoration: underline;}
+div.topic
+{
+	margin-left: 20px;
+}
+div.subtopic
+{
+	margin-left: 20px;
+}
+p.example_head
+{
+	font-weight: bold;
+	cursor: pointer;
+	background-color: #dfd;
+}
+p.example_body
+{
+	display: none;
+	margin-left: 10px;
+}
+pre.example_body
+{
+	display: none;
+	margin-left: 10px;
+}
+div.example
+{
+}
+div.function
+{
+	border: 1px dashed #000;
+	margin-bottom: 0.5em;
+	padding-left: 10px;
+}
+div.function > p
+{
+	margin-top: 0px;
+	margin-left: 40px;
+}
+</style>
+<script language="javascript" type="text/javascript">
+var hashMap = new Array();
+function toggleView(a, b, c)
+{
+	if(hashMap[a] == undefined)
+		hashMap[a] = 1;
+	else
+		hashMap[a] = 1 - hashMap[a];
+	document.getElementById(b).style.display = hashMap[a] ? "block" : "none";
+	document.getElementById(a).innerHTML = (hashMap[a] ? "Hide " : "Show ") + c;
+}
+</script>
+	</head>
+	<body>
+<h2 align="center">NULLC Language reference</h2>
+<ol>
+	<li>General</li>
+	<ol>
+		<li><a href="#basictypes">Basic types</a></li>
+		<li><a href="#varalign">Variable alignment</a></li>
+		<li><a href="#typeauto">Type inference</a></li>
+	</ol>
+	<li>Expressions</li>
+	<ol>
+		<li><a href="#import">import expression</a></li>
+		<li><a href="#typeof">typeof expression</a></li>
+		<ol>
+			<li><a href="#typeof_ext">Extended typeof expressions</a></li>
+		</ol>
+		<li><a href="#sizeof">sizeof expression</a></li>
+		<li><a href="#new">new expression</a></li>
+		<ol>
+			<li><a href="#gc">Garbage collection</a></li>
+			<li><a href="#constructor">Constructor call</a></li>
+			<li><a href="#finalize">Object finalization</a></li>
+		</ol>
+		<li><a href="#break">break expression</a></li>
+		<li><a href="#continue">continue expression</a></li>
+		<li><a href="#return">return expression</a></li>
+		<li><a href="#yield">yield expression</a></li>
+		<li><a href="#typedef">typedef expression</a></li>
+	</ol>
+	<li>Statements</li>
+	<ol>
+		<li><a href="#if">if statement</a></li>
+		<ol>
+			<li><a href="#static_if">Static if</a></li>
+		</ol>
+		<li><a href="#for">for statement</a></li>
+		<ol>
+			<li><a href="#forsimple">C-style for</a></li>
+			<li><a href="#foreach">for each</a></li>
+			<li><a href="#foreachiternator">Custom iterator</a></li>
+		</ol>
+		<li><a href="#while">while statement</a></li>
+		<li><a href="#do">do...while statement</a></li>
+		<li><a href="#switch">switch statement</a></li>
+	</ol>
+	<li>Declarations</li>
+	<ol>
+		<li><a href="#classes">User classes</a></li>
+		<ol>
+			<li><a href="#classaccessor">Accessors</a></li>
+			<li><a href="#classgeneric">Generic classes</a></li>
+			<ol>
+				<li><a href="#classgenericspec">Generic class member type specialization</a></li>
+			</ol>
+			<li><a href="#classconstructor">Class constructor</a></li>
+			<li><a href="#classforward">Class forward declaration</a></li>
+		</ol>
+		<li><a href="#vardef">Variables</a></li>
+		<li><a href="#functions">Functions</a></li>
+		<ol>
+			<li><a href="#varargs">Variable argument list</a></li>
+			<li><a href="#funclocal">Local functions</a></li>
+			<li><a href="#funcclosure">Closures</a></li>
+			<li><a href="#funcmember">Member functions</a></li>
+			<li><a href="#funcinline">Function Literals</a></li>
+			<li><a href="#funcshort">Short inline functions</a></li>
+			<li><a href="#funcoverload">Function overloading</a></li>
+			<li><a href="#funcoperators">Operator overloading</a></li>
+			<li><a href="#coroutine">Coroutines</a></li>
+			<li><a href="#generic">Generic functions</a></li>
+			<li><a href="#genericspec">Generic function specialization</a></li>
+		</ol>
+		<li><a href="#arrunsized">Arrays with implicit size</a></li>
+		<li><a href="#enum">Enumeration</a></li>
+		<li><a href="#namespace">Namespaces</a></li>
+	</ol>
+	<li>Special types</li>
+	<ol>
+		<li><a href="#autoref">auto ref</a></li>
+		<ol>
+			<li><a href="#autorefcall">function call through auto ref</a></li>
+		</ol>
+		<li><a href="#autoarray">auto[]</a></li>
+		<li><a href="#typeid">typeid</a></li>
+	</ol>
+	<li>Miscellaneous</li>
+	<ol>
+		<li><a href="#characters">Characters</a></li>
+		<li><a href="#strings">Strings</a></li>
+		<ol>
+			<li><a href="#unescaped">Unescaped strings</a></li>
+		</ol>
+		<li><a href="#arrayinline">Inline arrays</a></li>
+		<ol>
+			<li><a href="#listcomprehension">List comprehension</a></li>
+		</ol>
+		<li><a href="#escapeseq">Escape sequences</a></li>
+		<li><a href="#binnum">Binary numbers</a></li>
+		<li><a href="#octnum">Octal numbers</a></li>
+		<li><a href="#hexnum">Hexadecimal numbers</a></li>
+		<li><a href="#nullptr">Null pointer</a></li>
+	</ol>
+	<li>Standard library</li>
+	<ol>
+		<li><a href="#std_typeinfo">std.typeinfo</a></li>
+		<li><a href="#std_dynamic">std.dynamic</a></li>
+		<li><a href="#std_gc">std.gc</a></li>
+		<li><a href="#std_vector">std.vector</a></li>
+		<li><a href="#std_list">std.list</a></li>
+		<li><a href="#std_hashmap">std.hashmap</a></li>
+		<li><a href="#std_range">std.range</a></li>
+		<li><a href="#std_file">std.file</a></li>
+		<li><a href="#std_io">std.io</a></li>
+		<li><a href="#std_random">std.random</a></li>
+		<li><a href="#std_time">std.time</a></li>
+	</ol>
+	<li>Appendix</li>
+	<ol>
+		<li><a href="#convrules">Rules applied to value types in a binary operation</a></li>
+		<li><a href="#oppriority">Operator priority</a></li>
+		<li><a href="#convimplicit">Implicit conversions</a></li>
+	</ol>
+</ol>
+<hr />
+<h2 align="center">1. General</h2>
+<div class="topic">
+	<h3><a name="basictypes">1.1 Basic types</a></h3>
+
+	<table border="1px">
+		<tr><th>Name</th><th>Size</th><th>Default alignment</th><th>Extra information</th></tr>
+		<tr><td>void</td><td>0 bytes</td><td>no alignment</td><td>only allowed as a function return value (returns nothing)</td></tr>
+		<tr><td>bool</td><td>1 byte</td><td>no alignment</td><td>values: false (0) or true (1)</td></tr>
+		<tr><td>char</td><td>1 byte</td><td>no alignment</td><td>values: -128..127</td></tr>
+		<tr><td>short</td><td>2 bytes</td><td>same as in C++ (usually, 2)</td><td>values: -32768..32767</td></tr>
+		<tr><td>int</td><td>4 bytes</td><td>same as in C++ (usually, 4)</td><td>values: -2147483648..2147483647</td></tr>
+		<tr><td>long</td><td>8 bytes</td><td>same as in C++ (usually 4 or 8)</td><td>values: -9223372036854775808..9223372036854775807</td></tr>
+		<tr><td>float</td><td>4 bytes</td><td>same as in C++ (usually, 4)</td><td>values: as per IEEE 754</td></tr>
+		<tr><td>double</td><td>8 bytes</td><td>same as in C++ (usually 4 or 8)</td><td>values: as per IEEE 754</td></tr>
+	</table>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="varalign">1.2 Variable alignment</a></h3>
+
+	Default type alignment can be changed using two statements:<br />
+	noalign before type name will disable any default type alignment:<br />
+	<p class="code">
+		<span class="rword">noalign</span> <span class="rword">type</span> name; <span class="comment">// variable "name" of type "type" will not be aligned</span>
+	</p>
+	align(bytes) before type name will force specified alignment:<br />
+	<p class="code">
+		<span class="rword">align</span>(<span class="real">8</span>) <span class="rword">type</span> name; <span class="comment">// variable "name" of type "type" will be aligned to a 8 byte boundary.</span>
+	</p>
+	Alignment must not exceed 16 bytes.<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="typeauto">1.3 Type inference</a></h3>
+
+	When defining a variable, type name can be replaced with a keyword "auto".<br />
+	In this case, type will be inferred from r-value type.<br />
+	Here are some examples:
+	<p class="code">
+		<span class="rword">auto</span> i = <span class="real">5</span>; <span class="comment">// i will have type int</span><br />
+		<span class="rword">auto</span> n = &i; <span class="comment">// n will have type int ref</span><br />
+		<span class="rword">int</span>[<span class="real">10</span>] arr;<br />
+		<span class="rword">auto</span> copy = arr; <span class="comment">// copy will have type int[10]</span>
+	</p>
+	Alignment of automatic types works just like with explicitly specified types.<br />
+	<br />
+	auto can be used as a function return type. If a function has different exit points returning different type, an error occurs.<br />
+	auto can be used as a function argument type as long as this arguments has a default value.<br />
+	<br />
+	Type inference also works in situations where overloaded function pointer is used. Compiler will infer needed overload in the following context:<br />
+	- assignment to a variable with known type<br />
+	- return from a function with known return type<br />
+	- in default function arguments<br />
+	- in function call argument list<br />
+</div>
+<hr />
+<h2 align="center">2. Expressions</h2>
+<div class="topic">
+	<h3><a name="import">2.1 import expression</a></h3>
+
+	<span class="rword">import</span> expressions allows code to import functions, classes and variables from other files.<br />
+	<br />
+	<span class="rword">import</span> expressions must be placed at the beginning of a file before any other expression or definition.<br />
+	A file name without extension must be specified after <span class="rword">import</span>.<br />
+	Also, folder name is accepted after <span class="rword">import</span> keyword, then a point '.' and another folder\file name expected.<br />
+	<br />
+	Expression examples:<br />
+	<p class="code">
+		<span class="rword">import</span> a; <span class="comment">// builds a.nc file and imports functions, classes and variables from it</span><br />
+		<span class="rword">import</span> d.e; <span class="comment">// builds d\e.nc file and imports functions, classes and variables from it</span><br />
+	</p>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="typeof">2.2 typeof operator</a></h3>
+
+	<span class="rword">typeof</span>(expression) allows to get type of an expression (expression will not be evaluated at run time).<br />
+	<p class="code">
+	<span class="rword">typeof</span>(<span class="real">4</span>) is equal to specifying int.<br />
+	<span class="rword">typeof</span>(<span class="real">4</span> * <span class="real">0.2</span>) is equal to specifying double.<br />
+	</p>
+	<div class="subtopic">
+		<h3><a name="typeof_ext">2.2.1 Extended typeof expressions</a></h3>
+		Additional type information can be requested after a <span class="rword">typeof</span> expression.<br />
+		<br />
+		For function types following extended expressions are available:
+		<p class="code">
+		<span class="rword">typeof</span>(expression).<span class="rword">argument</span>.<span class="rword">first</span> - returns type of the first argument<br />
+		<span class="rword">typeof</span>(expression).<span class="rword">argument</span>.<span class="rword">last</span> - returns type of the last argument<br />
+		<span class="rword">typeof</span>(expression).<span class="rword">argument</span>.<span class="rword">size</span> - returns argument count<br />
+		<span class="rword">typeof</span>(expression).<span class="rword">argument</span>[<span class="real">N</span>] - returns argument at specified index<br />
+		<span class="rword">typeof</span>(expression).<span class="rword">return</span> - returns function return type<br />
+		</p>
+		For array types and reference types, the following extended expression is available:
+		<p class="code">
+		<span class="rword">typeof</span>(expression).<span class="rword">target</span> - returns the type of an array element type or a type the reference points to<br />
+		</p>
+		For array types, the following extended expression is available:
+		<p class="code">
+		<span class="rword">typeof</span>(expression).<span class="rword">arraySize</span> - returns size of an array (-1 for array with implicit size)<br />
+		</p>
+		Additional extended expressions are available for all types:
+		<p class="code">
+		<span class="rword">typeof</span>(expression).<span class="rword">isReference</span> - returns 1 if type is a reference and 0 otherwise<br />
+		<span class="rword">typeof</span>(expression).<span class="rword">isArray</span> - returns 1 if type is an array and 0 otherwise<br />
+		<span class="rword">typeof</span>(expression).<span class="rword">isFunction</span> - returns 1 if type is a function and 0 otherwise<br />
+		</p>
+		It is possible to get class typedef target type, class member type or a class constant value by writing a name after the point.<br />
+		<br />
+		Extended typeof expressions are also available for use immediately after the type name.<br />
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="sizeof">2.3 sizeof operator</a></h3>
+
+	<span class="rword">sizeof</span>(type) returns size of type.<br />
+	<span class="rword">sizeof</span>(expression) returns size of the expression type (it is equal to "<span class="rword">sizeof</span>(<span class="rword">typeof</span>(expression))")<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="new">2.4 new expression</a></h3>
+
+	<span class="rword">new</span> expression allows to allocate memory from global heap.<br />
+	There are two versions of this expression - one is used to allocate classes and the second one is used to allocate arrays.<br />
+	<br />
+	Return type of "<span class="rword">new</span> type" is 'type ref'.<br />
+	Return type of "<span class="rword">new</span> type[N]", where N is an expression that results in a number is 'type[]'.<br />
+	<div class="subtopic">
+		<h3><a name="gc">2.4.1 Garbage collection</a></h3>
+
+		There is not implicit memory deallocation function, dynamic memory is managed by NULLC and is garbage collected.<br />
+		Garbage collection is aware that some pointers may point to a memory not managed by NULLC (you can pass pointers to your objects safely to NULLC) and will skip those.<br />
+		<br />
+		Some form of explicit management is exposed through <a href="#std_gc" title="std.gc module">std.gc</a> module.<br />
+	</div>
+	<div class="subtopic">
+		<h3><a name="constructor">2.4.2 Constructor call</a></h3>
+		If a single object is created, it is possible to call a type constructor in a <span class="rword">new</span> expression, by opening parenthesis and writing function arguments.<br />
+		<p class="code">
+		<span class="rword">int ref</span> x = <span class="rword">new</span></span> <span class="rword">int</span>(<span class="real">12</span>);<br />
+		</p>
+		Default class constructor will be called if parentheses  are not written.<br />
+		To define a constructor for a type, add a member function with the name equal to the class name. Read more in a topic about <a href="#classconstructor">class constructor</a>.<br />
+		<br />
+		It is possible to define custom construction for an object by writing code inside figure braces {}:<br />
+		<pre class="code">
+<span class="rword">class Foo</span>{ <span class="rword">int </span><span class="vardef">x</span>; }
+<span class="rword">auto </span><span class="vardef">a </span>= <span class="rword">new Foo</span><span class="bold">{ </span><span class="var">x </span>= <span class="real">4</span>; <span class="bold">}</span>;
+<span class="rword">auto </span><span class="vardef">b </span>= <span class="rword">new Foo</span><span class="bold">(){ </span><span class="var">x </span>= <span class="real">8</span>; <span class="bold">}</span>;
+<span class="rword">return </span><span class="var">a</span>.<span class="var">x </span>+ <span class="var">b</span>.<span class="var">x</span><span class="bold">;</span><span class="comment"> // 12
+</span></pre>
+	</div>
+	<div class="subtopic">
+		<h3><a name="finalize">2.4.3 Object finalization</a></h3>
+		
+		If a class implements a "finalize" function which doesn't accept any arguments, then when GC finds that the class instance is not referenced any more, this function will be called
+		to perform any kind of clean-up you may want to do on it.<br />
+		Finalizable class has a restriction that other classes do not have: it cannot be placed on stack or be a member of some other class, only references to it or arrays with implicit size
+		can be created.<br />
+		<br />
+		It is strongly not recommended to create new references to an object from its finalizer because finalizer runs automatically only once per class instance.<br />
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="break">2.5 break expression</a></h3>
+
+	<span class="rword">break</span> expression allows to end execution of a cycle.<br />
+	<br />
+	<span class="rword">break</span>; exits current cycle.<br />
+	<span class="rword">break</span> <span class="real">N</span>; where N is number, known at compile time exits from N cycles beginning from where it is written.<br />
+	<span class="rword">break</span> <span class="real">1</span>; is equal to <span class="rword">break</span>;<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="continue">2.6 continue expression</a></h3>
+
+	<span class="rword">continue</span> expression allows to skip to the next iteration of a cycle.<br />
+	<br />
+	<span class="rword">continue</span>; skips to the end of current cycle.<br />
+	<span class="rword">continue</span> <span class="real">N</span>; where N is number, known at compile time exits from (N-1) cycles beginning from where it is written and skips to the next iteration of cycle it ends up.<br />
+	<span class="rword">continue</span> <span class="real">1</span>; is equal to <span class="rword">continue</span>;<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="return">2.7 return expression</a></h3>
+
+	<span class="rword">return</span> expression allows to return a value or exit from a function, or to end execution of a program if placed in global scope.<br />
+	<p class="code">
+		<span class="rword">return</span>; <span class="comment">// exits function, returning void type (nothing).</span><br />
+		<span class="rword">return</span> expr; <span class="comment">// exits function or ends program execution, returning result of "expr".</span><br />
+	</p>
+	<span class="rword">return</span> that is placed globally accepts only basic build-un types and cannot return void.<br />
+	<br />
+	When value is returned from function, it is converted to functions' return type if conversion is possible.<br />
+	If function return type is <a href="#typeauto">auto</a>, function return type is set to the type of "expr".<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="yield">2.8 yield expression</a></h3>
+
+	<span class="rword">yield</span> expression allows to return a value (optionally) and execution to the calling function. The difference from <span class="rword">return</span> expression
+	is that the next time the function is called; it will continue execution from the point immediately after last <span class="rword">yield</span>.<br />
+	<p class="code">
+		<span class="rword">yield</span>; <span class="comment">// returning void type (nothing).</span><br />
+		<span class="rword">yield</span> expr; <span class="comment">// returning result of "expr".</span><br />
+	</p>
+	Return value conversion and <a href="#typeauto">auto</a> return type resolution is performed exactly as if <span class="rword">return</span> expression was used.<br />
+	<span class="rword">yield</span> can only be used inside <a href="#coroutine">coroutines</a>.
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="typedef">2.9 typedef expression</a></h3>
+
+	<span class="rword">typedef</span> expression allows to create one-word aliases to other types.<br />
+	<br />
+	<span class="rword">typedef</span> doesn't create new type, it just allows its target type to have different names.<br />
+	<br />
+	Examples:
+	<p class="code">
+		<span class="rword">typedef</span> <span class="rword">int</span>[<span class="real">4</span>] fourInts;<br />
+		<span class="rword">typedef</span> <span class="rword">int</span> <span class="rword">ref</span>(<span class="rword">int</span>, <span class="rword">int</span>) drawCallback;<br />
+	</p>
+</div>
+<hr />
+
+<h2 align="center">3. Statements</h2>
+<div class="topic">
+	<h3><a name="if">3.1 if statement</a></h3>
+
+	<p class="code">
+		<span class="rword">if</span>(<span class="var">expr</span>)<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">trueBody</span><br />
+		<span class="rword">else</span><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">falseBody</span><br />
+	</p>
+	<span class="rword">if</span> statement evaluates result of expression "expr", and if result isn't equal to 0, evaluates expressions put in "trueBody". Otherwise, it evaluates expressions put in "falseBody".<br />
+	"trueBody" and "falseBody" may consist of a single expression or a block of expressions.<br />
+	<span class="rword">else</span> and "falseBody", may be omitted. In such case, if result of "expr" is zero, nothing is evaluated.<br />
+	<br />
+	If "expr" type is a user-defined type, a conversion to bool is performed by calling bool(expr) function.<br />
+	<div class="subtopic">
+		<h4><a name="static_if">3.1.1 Static if</a></h4>
+
+		If an <span class="rword">@</span> is placed before an <span class="rword">if</span> expression, then, condition will be evaluated at compilation time (which is not always possible) and
+		the body will be compiled only if condition is true.<br />
+		This is most useful in generic functions where different code paths can be made for different type groups and not all code paths can be successfully compiled with wrong type groups.<br />
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="for">3.2 for statement</a></h3>
+
+	<div class="subtopic">
+		<h4><a name="forsimple">3.2.1 C-style for</a></h4>
+
+		<p class="code">
+			<span class="rword">for</span>(<span class="var">initexpr</span>; <span class="var">condexpr</span>; <span class="var">iterexpr</span>)<br />
+			&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">body</span><br />
+		</p>
+		<span class="rword">for</span> statement is a cycle that evaluates "initexpr", and executes "body" while "condexpr" evaluates to a non-zero value.<br />
+		"iterexpr" is evaluated at the end of every cycle.<br />
+		<br />
+		"body", "initexpr" and "iterexpr" may consist of a single expression or a block of expressions.<br />
+		"condexpr" must be a single expression with result type of int\long\double.<br />
+		<br />
+		If "condexpr" type is a user-defined type, a conversion to bool is performed by calling bool(condexpr) function.<br />
+	</div>
+	<div class="subtopic">
+		<h4><a name="foreach">3.2.2 for each</a></h4>
+
+		A shorter form of for exists to iterate through all elements of an array, a custom iterator or a coroutine.<br />
+		<p class="code">
+			<span class="rword">for</span>(<span class="rword">type</span> <span class="var">refName</span> <span class="rword">in</span> <span class="var">expression</span>, <span class="rword">type</span> <span class="var">refNameN</span> <span class="rword">in</span> <span class="var">expressionN</span>)<br />
+			&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">body</span><br />
+		</p>
+		<span class="rword">type</span> name is optional and should be used when iterator return type is <a href="#autoref" title="auto ref type"><span class="rword">auto ref</span></a>, to convert it to selected type.<br />
+		If more than one iterator is specified, loop will terminate when one of the iterators reaches its end.<br />
+		For example, return value of the following code is 14 (1 * 4 + 2 * 5):
+		<p class="code"><span class="rword">int</span> sum = 0;<br />
+			<span class="rword">for</span>(x <span class="rword">in</span> {1, 2, 3}, y <span class="rword">in</span> {4, 5})<br />
+			&nbsp;&nbsp;&nbsp;&nbsp;sum += x * y;<br />
+			<span class="rword">return</span> sum;<br />
+		</p>
+		It is possible to iterate through all the elements yielded by a <a href="#coroutine">coroutine</a>.<br />
+		But be careful, just like in a <a href="#listcomprehension">list comprehension</a>, a <a href="#return">return</a> expression will stop the iteration, ignoring the result.<br />
+	</div>
+	<div class="subtopic">
+		<h4><a name="foreachiternator">3.2.3 Custom iterator</a></h4>
+
+		If you wish to iterate over elements of your type or add a contextless custom iterator (for examples of those, see <a href="#std_range" title="std.range module">std.range</a> module), you must add a specific function:<br />
+		<p class="code">
+			<span class="rword">type_iterator</span> <span class="rword">type</span>:start()<br />
+			{<br />
+			&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/* code that returns iterator */</span><br />
+			}
+		</p>
+		start() function will be explicitly called for expression to the right of <span class="rword">in</span> keyword.<br />
+		<br />
+		Iterator type must implement two functions:<br />
+		<p class="code">
+			<span class="rword">auto</span> <span class="rword">type_iterator</span>:hasnext()<br />
+			{<br />
+			&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/* return 1 if there are elements left to iterate through, and 0 to end iteration */</span><br />
+			}
+		</p>
+		<p class="code">
+			<span class="rword">auto</span> <span class="rword">type_iterator</span>:next()<br />
+			{<br />
+			&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/* code that returns current element and moves on to the next */</span><br />
+			}
+		</p>
+		Keep in mind that next() function should return <b>current</b> iterator element and move on to the next.<br />
+		<div>
+			<p class="example_head" id="iterator_ex_1a" onmousedown="toggleView(&quot;iterator_ex_1a&quot;, &quot;iterator_ex_1b&quot;, &quot;example of an iterator over elements of a single-linked list.&quot;);">Show example of an iterator over elements of a single-linked list.</p>
+			<p class="code example_body" id="iterator_ex_1b">
+<span class="comment">// List node class contains element value and a pointer to the next element</span><br />
+<span class="rword">class</span> <span class="rword">list_node</span><br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">list_node</span> <span class="rword">ref</span>	next;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">int</span>				value;<br />
+}<br />
+<span class="comment">// list type iterator will contain pointer to the current node he is at.</span><br />
+<span class="rword">class</span> <span class="rword">list_iterator</span><br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">list_node</span> <span class="rword">ref</span> curr;<br />
+}<br />
+<span class="comment">// Iterator initialization function</span><br />
+<span class="rword">auto</span> <span class="rword">list_node</span>:<span class="func">start</span>()<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Create iterator</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">list_iterator</span> ret;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Set its start to this node</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">ret</span>.<span class="var">curr</span> = <span class="var">this</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// return iterator</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="var">ret</span>;<br />
+}<br />
+<span class="rword">auto</span> <span class="rword">list_iterator</span>:<span class="func">hasnext</span>()<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// While curent node pointer is valid, signal that there are elements left to iterate through</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="var">curr</span> ? <span class="real">1</span> : <span class="real">0</span>;<br />
+}<br />
+<span class="comment">// This function will return iterator element and move on to the next</span><br />
+<span class="rword">auto</span> <span class="rword">list_iterator</span>:<span class="func">next</span>()<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Save element value</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">int</span> ret = <span class="var">curr</span>.<span class="var">value</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Move to the next element</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">curr</span> = <span class="var">curr</span>.<span class="var">next</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Return old element value</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="var">ret</span>;<br />
+}<br />
+<span class="comment">// Create a list of two numbers</span><br />
+<span class="rword">list_node</span> list;<br />
+<span class="var">list</span>.<span class="var">value</span> = <span class="real">2</span>;<br />
+<span class="var">list</span>.<span class="var">next</span> = <span class="rword">new</span> <span class="rword">list_node</span>;<br />
+<span class="var">list</span>.<span class="var">next</span>.<span class="var">value</span> = <span class="real">5</span>;<br />
+<span class="comment">// Compute product of numbers in a list using our custom iterator</span><br />
+<span class="rword">int</span> product = <span class="real">1</span>;<br />
+<span class="rword">for</span>(i <span class="rword">in</span> <span class="var">list</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">product</span> *= <span class="var">i</span>;<br />
+<span class="rword">return</span> <span class="var">product</span>;<br />
+			</p>
+		</div>
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="while">3.3 while statement</a></h3>
+
+	<p class="code">
+		<span class="rword">while</span>(<span class="var">condexpr</span>)<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">body</span><br />
+	</p>
+	<span class="rword">while</span> statement is a cycle that executes "body" while "condexpr" evaluates to a non-zero value.<br />
+	<br />
+	"body" may consist of a single expression or a block of expressions.<br />
+	"condexpr" must be a single expression with result type of int\long\double.<br />
+	<br />
+	If "condexpr" type is a user-defined type, a conversion to bool is performed by calling bool(condexpr) function.<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="do">3.4 do...while statement</a></h3>
+
+	<p class="code">
+		<span class="rword">do</span><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">body</span><br />
+		<span class="rword">while</span>(<span class="var">condexpr</span>)<br />
+	</p>
+	<span class="rword">do</span> statement is a cycle that executes "body" while "condexpr" evaluates to a non-zero value.<br />
+	Difference from while statement is that do statement evaluates body at least once, since condition is placed after the body.<br />
+	<br />
+	"body" may consist of a single expression or a block of expressions.<br />
+	"condexpr" must be a single expression with result type of int\long\double.<br />
+	<br />
+	If "condexpr" type is a user-defined type, a conversion to bool is performed by calling bool(condexpr) function.<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="switch">3.5 switch statement</a></h3>
+
+	<p class="code">
+		<span class="rword">switch</span>(<span class="var">expr</span>)<br />
+		{<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">case</span> <span class="real">A</span>:<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">caseBody</span>;<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">default</span>:<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">defaultBody</span>;<br />
+		}<br />
+	</p>
+	<span class="rword">switch</span> statement evaluates result of "expr" and compares result with case label values. If result matches <span class="rword">case</span> value, a jump to a matched <span class="rword">case</span> label is made and all expressions after it are evaluated.<br />
+	If no case label value is equal to result, a jump to <span class="rword">default</span> label is made.<br />
+	<span class="rword">break</span>; expression can be used inside <span class="rword">switch</span> statement.<br />
+	<span class="rword">default</span> label can be omitted.<br />
+	<span class="rword">switch</span> without case labels, or without any expressions at all is legal.<br />
+</div>
+<hr />
+
+<h2 align="center">4. Declarations</h2>
+<div class="topic">
+	<h3><a name="classes">4.1 User classes</a></h3>
+
+	<p class="code">
+		<span class="rword">class</span> Name<br />
+		{<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">type</span> name, name, ...;<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">type</span> <span class="func">function</span>(<span class="rword">type</span> arg, <span class="rword">type</span> arg, ...){ }<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;...<br />
+		}<br />
+	</p>
+	Class consists of variables, functions, typedefs' and constants in any order, but keep in mind, functions can only access members that are defined before them.<br />
+	<br />
+	Class constants are numeric type members that are defined after a <span class="rword">const</span> keyword. Such members do not take any space inside a class, and can be accessed
+	as other members in an extended typeof expression with a difference that their value will be resolved immediately at compilation time.<br />
+	Constant members must have a default value assigned to them. Assignment can be skipped for integer constants after the first one in a comma-separated list, in which case they will
+	be autoincremented:<br /> 
+	<pre class="code">
+<span class="rword">class Foo
+</span>{<span class="comment">
+    // A equals 5, B equals 6 and C equals 7
+</span><span class="rword">    const int </span><span class="vardef">A </span>= <span class="real">5</span>, <span class="vardef">B</span>, <span class="vardef">C</span>;
+}
+<span class="rword">Foo </span><span class="vardef">a</span>;
+<span class="rword">return Foo</span>.<span class="var">B </span>+ <span class="var">a</span>.<span class="var">C</span><span class="bold">;</span><span class="comment"> // Answer is 13. Constants can be accessed directly or by using a class instance.</span></pre>
+	There is no default alignment by default. To specify alignment, put "noalign" of "align(bytes)" before "class" keyword.<br />
+	Specifying "noalign" is superfluous. Alignment must not exceed 16 bytes.<br />
+	<div class="subtopic">
+		<h4><a name="classaccessor">4.1.1 Accessors</a></h4>
+
+		There is a possibility to add virtual class members - members that can be used as any real class member, but access and modification of them is implemented in custom functions.<br />
+		To add an accessor to your class, use the following syntax:<br />
+		<p class="code">
+			<span class="comment">// read-only accessor</span><br />
+			<span class="rword">type</span> name{ <span class="rword">get</span>{ <span class="comment">/* getter body */</span> } };<br />
+			<span class="comment">// accessor with read/write access</span><br />
+			<span class="rword">type</span> name{ <span class="rword">get</span>{ <span class="comment">/* getter body */</span> } <span class="rword">set</span>{ <span class="comment">/* setter body */</span> } };<br />
+			<span class="comment">// accessor with read-write access and a custom name for right-hand value of set function</span><br />
+			<span class="rword">type</span> name{ <span class="rword">get</span>{ <span class="comment">/* getter body */</span> } <span class="rword">set</span>(value){ <span class="comment">/* setter body */</span> } };<br />
+		</p>
+		<div class="example">
+			<p class="example_head" id="accessor_ex_1a" onmousedown="toggleView(&quot;accessor_ex_1a&quot;, &quot;accessor_ex_1b&quot;, &quot;example of a read-only accessor.&quot;);">Show example of a read-only accessor.</p>
+			<p class="code example_body" id="accessor_ex_1b">
+<span class="comment">// Let's create a "sum" accessor to a class consisting of two numbers</span><br />
+<span class="rword">class</span> <span class="rword">NumberPair</span><br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">int</span> a, b;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// accessor is read-only and returns sum of both members. return type can be inferred automatically</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">auto</span> sum{ <span class="rword">get</span>{ <span class="rword">return</span> <span class="var">a</span> + <span class="var">b</span>; } };<br />
+}<br />
+<span class="rword">NumberPair</span> foo;<br />
+<span class="var">foo</span>.<span class="var">a</span> = <span class="real">5</span>;<br />
+<span class="var">foo</span>.<span class="var">b</span> = <span class="real">10</span>;<br />
+<span class="rword">return</span> <span class="var">foo</span>.<span class="var">sum</span>;	<span class="comment">// returns 15</span><br />
+			</p>
+		</div>
+		<div class="example">
+			<p class="example_head" id="accessor_ex_2a" onmousedown="toggleView(&quot;accessor_ex_2a&quot;, &quot;accessor_ex_2b&quot;, &quot;example of a read-write accessor.&quot;);">Show example of a read-write accessor.</p>
+			<p class="code example_body" id="accessor_ex_2b">
+<span class="comment">// Suppose we have a two-component floating point vector and we want to add a possibility for swizzling</span><br />
+<span class="rword">class</span> <span class="rword">vec2</span><br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">float</span> x, y;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// xy swizzle is trivial</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">auto</span> xy<br />
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">get</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="var">this</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">set</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">x</span> = <span class="var">r</span>.<span class="var">x</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">y</span> = <span class="var">r</span>.<span class="var">y</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;};<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// in yx swizzle, a temporary vector should be created</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">auto</span> yx<br />
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">get</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">vec2</span> tmp;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">tmp</span>.<span class="var">x</span> = <span class="var">y</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">tmp</span>.<span class="var">y</span> = <span class="var">x</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="var">tmp</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">set</span>(value)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">y</span> = <span class="var">value</span>.<span class="var">x</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">x</span> = <span class="var">value</span>.<span class="var">y</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;};<br />
+}<br />
+<span class="rword">vec2</span> foo;<br />
+<span class="var">foo</span>.<span class="var">x</span> = <span class="real">1.5</span>;<br />
+<span class="var">foo</span>.<span class="var">y</span> = <span class="real">2.5</span>;<br />
+<span class="rword">vec2</span> bar;<br />
+<span class="var">bar</span>.<span class="var">yx</span> = <span class="var">foo</span>.<span class="var">xy</span>;<br />
+<span class="rword">return</span> <span class="var">foo</span>.<span class="var">x</span> * <span class="var">bar</span>.<span class="var">y</span>; <span class="comment">// returns 2.25</span><br />
+			</p>
+		</div>
+		It is possible to add accessors to a class outside of a class definition. In this case, getter and setter are defined separately.<br />
+		A syntax is similar to external <a href="#funcmember">member function definition</a>, only '.' is used instead of ':':<br />
+		<p class="code">
+<span class="comment">// Second accessor of "read-write accessor" example above defined outside of a class</span><br />
+<span class="rword">auto</span> <span class="rword">vec2</span>.<span class="func">yx</span>()<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">vec2</span> tmp;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">tmp</span>.<span class="var">x</span> = <span class="var">y</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">tmp</span>.<span class="var">y</span> = <span class="var">x</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="var">tmp</span>;<br />
+}<br />
+<span class="rword">void</span> <span class="rword">vec2</span>.<span class="func">yx</span>(<span class="rword">vec2</span> <span class="rword">ref</span> value)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">y</span> = <span class="var">value</span>.<span class="var">x</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">x</span> = <span class="var">value</span>.<span class="var">y</span>;<br />
+}<br />
+		</p>
+	</div>
+	
+	<div class="subtopic">
+		<h4><a name="classgeneric">4.1.2 Generic classes</a></h4>
+		
+		Generic class is a class that depends on type arguments, a single definition of which can be instanced with different arguments to produce different types.<br />
+		Type argument list is a list of aliases to a to-be-defined-later types inside an angle-brackets '<' '>':<br />
+		<pre class="code">
+<span class="rword">class Pair</span>&lt;<span class="rword">T</span>, <span class="rword">U</span>&gt;
+{
+    <span class="rword">T </span><span class="vardef">first</span>;
+    <span class="rword">U </span><span class="vardef">second</span>;
+}		</pre>
+		This is a generic type definition, and it doesn't create any real types yet.<br />
+		Required type is instanced later, when generic type name is followed with a type list in angle-brackets:<br />
+		<pre class="code">
+<span class="rword">Pair</span>&lt;<span class="rword">int</span>, <span class="rword">float</span>&gt; <span class="vardef">a</span>;
+<span class="rword">Pair</span>&lt;<span class="rword">double</span>, <span class="rword">long</span>&gt; <span class="vardef">b</span>;</pre>
+		In this example, variables "a" and "b" have different types.<br />
+		Nesting generic types are also allowed:
+		<pre class="code">
+<span class="rword">Pair</span>&lt;<span class="rword">Pair</span>&lt;<span class="rword">int</span>, <span class="rword">int</span>&gt;, <span class="rword">Pair</span>&lt;<span class="rword">double</span>, <span class="rword">double</span>&gt;&gt; <span class="vardef">c</span>;</pre>
+		<div class="subtopic">
+			<h4><a name="classgenericspec">4.1.2.1 Generic class member type specialization</a></h4>
+			
+			It is possible to define a special member function implementation for a single instanced type by specifying full type name in an external member function definition:<br />
+			<pre class="code">
+<span class="rword">import </span><span class="var">std</span>.<span class="var">math</span>;<span class="comment">
+// define a tuple of two values
+</span><span class="rword">class Pair</span>&lt;<span class="rword">T</span>, <span class="rword">U</span>&gt;
+{
+<span class="rword">    T </span><span class="vardef">first</span>;
+<span class="rword">    U </span><span class="vardef">second</span>;
+}<span class="comment">
+// Helper function that returns a Pair object with type according to arguments
+</span><span class="rword">auto </span><span class="func">Pair</span><span class="bold">(</span>@<span class="rword">T </span><span class="var">a</span>, @<span class="rword">U </span><span class="var">b</span><span class="bold">){ </span><span class="rword">Pair</span>&lt;<span class="rword">T</span>, <span class="rword">U</span>&gt; <span class="vardef">p</span>; <span class="var">p</span>.<span class="var">first </span>= <span class="var">a</span>; <span class="var">p</span>.<span class="var">second </span>= <span class="var">b</span>; <span class="rword">return </span><span class="var">p</span><span class="bold">; }</span><span class="comment">
+
+// Function compares first with second
+</span><span class="rword">bool Pair</span><span class="bold">:</span><span class="func">Compare</span><span class="bold">(){ </span><span class="rword">return </span><span class="var">first </span>&gt; <span class="var">second</span><span class="bold">; }</span><span class="comment">
+// Specialization for pair of float2 compares vector lengths
+</span><span class="rword">bool Pair</span>&lt;<span class="rword">float2</span>, <span class="rword">float2</span>&gt;<span class="bold">:</span><span class="func">Compare</span><span class="bold">(){ </span><span class="rword">return </span><span class="var">first</span>.<span class="func">length</span><span class="bold">() </span>&gt; <span class="var">second</span>.<span class="func">length</span><span class="bold">(); }</span><span class="comment">
+
+// Create a pair
+</span><span class="rword">auto </span><span class="vardef">p </span>= <span class="func">Pair</span><span class="bold">(</span><span class="func">float2</span><span class="bold">(</span><span class="real">4</span>, <span class="real">4</span><span class="bold">)</span>, <span class="func">float2</span><span class="bold">(</span><span class="real">1</span>, <span class="real">5</span><span class="bold">))</span>;<span class="comment">
+// Compare values
+</span><span class="rword">return </span><span class="var">p</span>.<span class="func">Compare</span><span class="bold">();</span><span class="comment"> // true</span></pre>
+		</div>
+	</div>
+	<div class="subtopic">
+		<h4><a name="classconstructor">4.1.3 Class constructor</a></h4>
+	
+		A class member function that has the same name as the type is considered to be a <b>class constructor</b>.<br />
+		As described in a section about <a href="#constructor">new expression</a>, class constructors are functions that can be called after object allocation.<br />
+		But because an object can be placed on stack instead of heap memory, compiler will call a default constructor for variables that are placed on stack.<br />
+		Default constructor is simply a constructor that can be called without any arguments (constructor can have <a href="#funcdefarg">default function arguments</a>).<br />
+		<pre class="code">
+<span class="rword">class Foo
+</span>{
+<span class="rword">    int </span><span class="vardef">x</span>;
+<span class="rword">    void </span><span class="func">Foo</span><span class="bold">(){ </span><span class="var">x </span>= <span class="real">12</span>; <span class="bold">}
+</span>}
+<span class="rword">Foo </span><span class="vardef">a</span>;
+<span class="rword">return </span><span class="var">a</span>.<span class="var">x</span><span class="bold">;</span><span class="comment"> // 12</span></pre>
+		If a type has members with default constructor, but the type itself doesn't have a user-defined default constructor, the compiler will create a default constructor that
+		will be used until a user-defined default constructor is created.<br />
+		Moreover, class member default constructors will be called at the beginning of a user-defined constructor.<br />
+		<pre class="code">
+<span class="rword">class Foo
+</span>{
+<span class="rword">    int </span><span class="vardef">x</span>;
+<span class="rword">    void </span><span class="func">Foo</span><span class="bold">(){ </span><span class="var">x </span>= <span class="real">12</span>; <span class="bold">}
+</span>}
+<span class="rword">class Bar
+</span>{
+    <span class="rword">int </span><span class="vardef">y</span>;
+    <span class="rword">Foo </span><span class="vardef">z</span>;
+<span class="rword">    void </span><span class="func">Bar</span><span class="bold">(){ </span><span class="var">y </span>= <span class="real">20</span>; <span class="bold">}</span><span class="comment"> // default Foo constructor is called automatically
+</span>}
+<span class="rword">Bar </span><span class="vardef">a</span>;
+<span class="rword">return </span><span class="var">a</span>.<span class="var">z</span>.<span class="var">x </span>* <span class="var">a</span>.<span class="var">y</span><span class="bold">;</span><span class="comment"> // 240</span></pre>
+		Class constructor can be called as a global function. In this case, class constructor return type is ignored and constructor call results in a new temporary object on stack:<br />
+		<pre class="code">
+<span class="rword">class Foo
+</span>{
+<span class="rword">    int </span><span class="vardef">x</span>;
+<span class="rword">    void </span><span class="func">Foo</span><span class="bold">(</span><span class="rword">int </span><span class="var">x</span><span class="bold">){ </span><span class="var">this</span>.<span class="var">x </span>= <span class="var">x</span>; <span class="bold">}
+</span>}
+<span class="rword">Foo </span><span class="vardef">a </span>= <span class="func">Foo</span><span class="bold">(</span><span class="real">5</span><span class="bold">)</span>;
+<span class="rword">return </span><span class="var">a</span>.<span class="var">x</span><span class="bold">;</span><span class="comment"> // 5</span></pre>
+	</div>
+	
+	<div class="subtopic">
+		<h4><a name="classforward">4.1.4 Class forward declaration</a></h4>
+
+		It is possible to define a type name without defining internal class structure. Such definitions are called forward declarations.<br />
+		A forward-declared type is limited in how it is used: only references to it or arrays with implicit size can be defined until the full class definition.<br />
+		<pre class="code">
+<span class="rword">class List</span>;
+<span class="rword">class Node
+</span>{
+    <span class="rword">int </span><span class="vardef">value</span>;
+    <span class="rword">Node ref </span><span class="vardef">next</span>;
+    <span class="rword">List ref </span><span class="vardef">parent</span>;
+}
+<span class="rword">class List
+</span>{
+    <span class="rword">Node ref </span><span class="vardef">first</span>;
+}</pre>
+		It is not possible to create a forward declaration for a generic class.
+	</div>
+</div>
+<hr />
+
+<div class="topic">
+	<h3><a name="vardef">4.2 Variables</a></h3>
+
+	Simple variable definition syntax is:
+	<p class="code">
+		<span class="rword">type</span> name;
+	</p>
+	Arrays are defined like this:
+	<p class="code">
+		<span class="rword">type</span>[<span class="real">N</span>] name;
+	</p>
+	or
+	<p class="code">
+		<span class="rword">type</span>[] name;
+	</p>
+	If array size is specified, it must be a number known at compile type.<br />
+	Second declaration is described in section <a href="#arrunsized">"Arrays with implicit size"</a>.<br />
+	<br />
+	Pointers are defined by using "ref" keyword:
+	<p class="code">
+		<span class="rword">type</span> <span class="rword">ref</span> name;
+	</p>
+	Pointers to functions are defined by using "ref" keyword, followed by a list of function argument types in parenthesis:
+	<p class="code">
+		<span class="rword">type</span> <span class="rword">ref</span>(<span class="rword">type</span>, <span class="rword">type</span>) name;
+	</p>
+	More than one variable can be defined in one statement, by specifying variable names after a comma.<br />
+	All variables defined in one statement have equal type.<br />
+	Different type modificators can be mixed together to form types like, for example:
+	<p class="code">
+		<span class="rword">int</span>[<span class="real">4</span>][<span class="real">2</span>] name; <span class="comment">// array of 4 arrays of two integers</span><br />
+		<span class="rword">int</span> <span class="rword">ref</span>(<span class="rword">int</span>, <span class="rword">int</span>)[<span class="real">4</span>] name; <span class="comment">// array of 4 pointers to functions, returning int</span>
+	</p>
+	A value can be assigned to a variable in place of its definition, by writing "= value" after its name.<br />
+	If array element is assigned to a type, then it will be a default value of all array elements.<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="functions">4.3 Functions</a></h3>
+
+	Global functions, nested (local) functions, member functions and function literals are supported.<br />
+	<br />
+	Function definition starts with a function return type, followed by name and a list of arguments in parenthesis.<br />
+	List of arguments starts with a type that is followed by one or more parameter names, separated by comma. After a comma, a different type can be selected as well.<br />
+	Function body must be enclosed in { } block.<br />
+	<p class="code">
+		<span class="rword">type</span> <span class="func">name</span>(<span class="rword">type</span> a, b, <span class="rword">type</span> c, d){ }
+	</p>
+	Function return type can be any type expression including <span class="rword">auto</span>.<br />
+	Function argument type can be auto only if it has default argument value.<br />
+	<a name="funcdefarg"></a>Function default argument value is specified by writing "= value" directly after argument name:<br />
+	<p class="code">
+		<span class="rword">auto</span> <span class="func">function</span>(<span class="rword">int</span> a = <span class="real">5</span>, <span class="auto">int</span> b = <span class="real">5.0</span>){ }
+	</p>
+	After first argument with a default value, the following arguments must all have a default value.<br />
+	<hr />
+	<div class="subtopic">
+		<h4><a name="varargs">4.3.1 Variable argument list</a></h4>
+
+		It is possible to create a function that accepts an unspecified number of arguments (like using an ellipsis in C++).<br />
+		To do so, set the type of the last argument of your function to <span class="rword">auto ref</span>[].<br />
+		All excessive arguments will be packed into the <span class="rword">auto ref</span> array, so an <a href="#auterefcast" title="auto ref type explicit cast">explicit cast</a> is needed to convert it to the type you want.<br />
+		<div class="example">
+			<p class="example_head" id="varargs_ex_1a" onmousedown="toggleView(&quot;varargs_ex_1a&quot;, &quot;varargs_ex_1b&quot;, &quot;example of sum of integers using function with variable arguments.&quot;);">Show example of sum of integers using function with variable arguments.</p>
+			<p class="code example_body" id="varargs_ex_1b">
+<span class="comment">// A function that returns sum of all its arguments. Function expects integers.</span><br />
+<span class="rword">int</span> <span class="func">sum</span>(<span class="rword">auto ref</span>[] args)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">int</span> result = <span class="real">0</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// iterate through all arguments and sum them</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">for</span>(i <span class="rword">in</span> <span class="var">args</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">result</span> += <span class="rword">int</span>(<span class="var">i</span>);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="var">result</span>;<br />
+}<br />
+<span class="rword">return</span> <span class="func">sum</span>(<span class="real">1</span>, <span class="real">12</span>, <span class="real">201</span>);	<span class="comment">// 214</span><br />
+			</p>
+		</div>
+		Argument type can be found using <span class="func">typeid</span>() function.<br />
+		<div class="example">
+			<p class="example_head" id="varargs_ex_2a" onmousedown="toggleView(&quot;varargs_ex_2a&quot;, &quot;varargs_ex_2b&quot;, &quot;example of println function.&quot;);">Show example of println function.</p>
+			<p class="code example_body" id="varargs_ex_2b">
+<span class="comment">// Import module that enables output to console.</span><br />
+<span class="rword">import</span> <span class="var">std</span>.<span class="var">io</span>;<br />
+<span class="comment">// Function returns number of printed arguments</span><br />
+<span class="rword">int</span> <span class="func">println</span>(<span class="rword">auto ref</span>[] args)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Assume we are able to print all arguments</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">int</span> printedArgs = <span class="var">args</span>.<span class="var">size</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// iterate through all arguments</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">for</span>(i <span class="rword">in</span> <span class="var">args</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// switch by argument type</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">switch</span>(<span class="func">typeid</span>(<span class="var">i</span>))<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">case int</span>:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">io</span>.<span class="var">out</span> << <span class="func">int</span>(<span class="var">i</span>);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">break</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">case double</span>:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">io</span>.<span class="var">out</span> << <span class="func">double</span>(<span class="var">i</span>);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">break</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">case char</span>[]:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">io</span>.<span class="var">out</span> << <span class="rword">char</span>[](<span class="var">i</span>);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">break</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// unknown type, unable to print it, so we decrement printed argument count</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">default</span>:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">printedArgs</span>--;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Add newline</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">io</span>.<span class="var">out</span> << <span class="var">io</span>.<span class="var">endl</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Return printed argument count</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="var">printedArgs</span>;<br />
+}<br />
+<span class="rword">return</span> <span class="func">println</span>(<span class="real">2</span>, " ", <span class="real">4</span>, "<span class="string"> hello </span>", <span class="real">5.0</span>, <span class="real">3.0f</span>);	<span class="comment">// output "2 4 hello 5.0"; 5 is returned</span><br />
+			</p>
+		</div>
+	</div>
+	<hr />
+	<div class="subtopic">
+		<h4><a name="funclocal">4.3.2 Local functions</a></h4>
+
+		Functions can be defined within other functions.<br />
+		Pointers to such functions remain valid after parent function ends.<br />
+	</div>
+	<hr />
+	<div class="subtopic">
+		<h4><a name="funcclosure">4.3.3 Closures</a></h4>
+
+		It is possible to take pointers to local functions, assign them to function pointer variables and return them from functions.<br />
+		Since locals are removed from stack when function ends, all removed locals used by local function are copied to function object and remain valid.<br />
+
+		<div class="example">
+			<p class="example_head" id="closure_ex_1a" onmousedown="toggleView(&quot;closure_ex_1a&quot;, &quot;closure_ex_1b&quot;, &quot;example of closure creation and usage.&quot;);">Show example of closure creation and usage.</p>
+			<p class="code example_body" id="closure_ex_1b">
+<span class="comment">// Import library for text output</span><br />
+<span class="rword">import</span> <span class="var">std</span>.<span class="var">io</span>;<br />
+<br />
+<span class="comment">// Function creates closure that sequentially returns numbers in a specified range with wrap to minimum after reaching maximum</span><br />
+<span class="rword">auto</span> <span class="func">sequence_range</span>(<span class="rword">int</span> <span class="var">min</span>, <span class="var">max</span>)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Initial position is 0</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">int</span> pos = <span class="real">0</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// This is the function that will be returned</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">int</span> <span class="func">generator</span>()<br />
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> (<span class="var">pos</span>++) % (<span class="var">max</span> - <span class="var">min</span> + <span class="real">1</span>) + <span class="var">min</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Return local function</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// All locals used in function (min, max, pos) are saved to function object and remain valid (and unique) for future function calls</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="var">generator</span>;<br />
+}<br />
+<span class="comment">// Create two range generators</span><br />
+<span class="rword">auto</span> from2to10 = <span class="func">sequence_range</span>(<span class="real">2</span>, <span class="real">10</span>);<br />
+<span class="rword">auto</span> from5to6 = <span class="func">sequence_range</span>(<span class="real">5</span>, <span class="real">6</span>);<br />
+<br />
+<span class="comment">// Retrieve some numbers</span><br />
+<span class="var">io</span>.<span class="var">out</span> << <span class="func">from2to10</span>() << " " << <span class="func">from5to6</span>() << <span class="var">io</span>.<span class="var">endl</span>; <span class="comment">// 2 5</span><br />
+<span class="var">io</span>.<span class="var">out</span> << <span class="func">from2to10</span>() << " " << <span class="func">from5to6</span>() << <span class="var">io</span>.<span class="var">endl</span>; <span class="comment">// 3 6</span><br />
+<span class="var">io</span>.<span class="var">out</span> << <span class="func">from2to10</span>() << " " << <span class="func">from5to6</span>() << <span class="var">io</span>.<span class="var">endl</span>; <span class="comment">// 4 5</span><br />
+<br />
+<span class="rword">return</span> 0;<br />
+			</p>
+		</div>
+	</div>
+	<hr />
+	<div class="subtopic">
+		<h4><a name="funcmember">4.3.4 Member functions</a></h4>
+
+		Functions can be defined not only inside class definitions, but also added to a class later.<br />
+		The following syntax is used to define class member function outside class definition:<br />
+		<p class="code">
+			<span class="rword">type</span> <span class="rword">type</span>:<span class="func">function</span>(<span class="comment">/* arguments */</span>){ }
+		</p>
+		Type before a column must be a direct type name or an alias defined with <span class="rword">typedef</span> expression.<br />
+		By using aliases it is possible to add member functions to array, reference and function types.<br />
+		Adding member function to array types with explicit size is pointless, because such variables are converted to arrays with implicit size before function call.<br />
+	</div>
+	<hr />
+	<div class="subtopic">
+		<h4><a name="funcinline">4.3.5 Function Literals</a></h4>
+
+		Functions can be written inside expressions, this could be used to define an anonymous function as a function argument, or to return function from function:
+		<p class="code">
+			<span class="rword">int</span> <span class="func">generateFrom</span>(<span class="rword">int</span> a)<br />
+			{<br />
+			&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="rword">int</span> <span class="func">gen</span>(){ <span class="rword">return</span> a++; };<br />
+			}<br />
+		</p>
+		Function name can be omitted if function return type is set to auto:
+		<p class="code">
+			<span class="rword">auto</span> a = <span class="rword">auto</span>(<span class="rword">int</span> b){ <span class="rword">return</span> -b; };<br />
+			<span class="rword">int</span> b = <span class="func">a</span>(5); <span class="comment">// b is -5</span><br />
+		</p>
+	</div>
+	<hr />
+	<div class="subtopic">
+		<h4><a name="funcshort">4.3.6 Short inline functions</a></h4>
+
+		When function is written in a function call argument list, special short-hand syntax is available:<br />
+		<pre class="code">
+<span class="rword">int </span><span class="func">foo</span><span class="bold">(</span><span class="rword">int ref</span>(<span class="rword">int</span>, <span class="rword">int</span>) <span class="var">f</span><span class="bold">){ </span><span class="rword">return </span><span class="func">f</span><span class="bold">(</span><span class="real">3</span>, <span class="real">4</span><span class="bold">); }
+</span><span class="rword">return </span><span class="func">foo</span><span class="bold">(&lt;</span><span class="var">i</span>, <span class="var">j</span><span class="bold">&gt;{ </span><span class="var">i </span>+ <span class="var">j</span>; <span class="bold">});
+</span></pre>
+		Short inline function literal starts with '&lt;', immediately followed by the argument list, which is ended by '&gt;'.<br />
+		Function argument types can be omitted, and serve a different purpose than argument types in a regular function.<br />
+		In short inline function literal, argument types are always inferred from the function pointer type that the called function expects, but if you do specify them,
+		a conversion to a specified type will be performed, for example:<br />
+		<pre class="code">
+<span class="rword">int </span><span class="func">foo</span><span class="bold">(</span><span class="rword">int ref</span>(<span class="rword">auto ref</span>, <span class="rword">auto ref</span>) <span class="var">f</span><span class="bold">){ </span><span class="rword">return </span><span class="func">f</span><span class="bold">(</span><span class="real">3</span>, <span class="real">4</span><span class="bold">); }
+</span><span class="rword">return </span><span class="func">foo</span><span class="bold">(&lt;</span><span class="rword">int </span><span class="var">i</span>, <span class="rword">int </span><span class="var">j</span><span class="bold">&gt;{ </span><span class="var">i </span>&lt; <span class="var">j</span>; <span class="bold">});
+</span></pre>
+		Here we have a function that calls a function pointer with two arguments of type 'auto ref', but they are implicitly converted to 'int' in our short inline function literal.<br />
+		<br />
+		Also, note that in a short inline function literal, the last expression implicitly computes a value that is returned from function. This is used in both examples above.<br />
+	</div>
+	<hr />
+	<div class="subtopic">
+		<h4><a name="funcoverload">4.3.7 Function overloading</a></h4>
+
+		Functions can be overloaded. Better matching function will be selected during overloaded function call.
+	</div>
+	<hr />
+	<div class="subtopic">
+		<h4><a name="funcoperators">4.3.8 Operator overloading</a></h4>
+
+		Operator overloading allows user to define operators that work with any type.<br />
+		If operator overloads are placed inside a class or a <a href="#funclocal" title="Local functions">function</a>, they will be visible until the end of a class or the end of a function.<br />
+		<br />
+		Following binary operators can be overloaded:<br />
+		+ - * / % ** < <= << > >= >> == != & | ^ && || ^^ = += -= *= /= **= %= <<= >>= &= |= ^= in<br />
+		For operators = += -= *= /= **= %= <<= >>= &= |= ^= and [], first argument should be a reference to a type, but this is not necessary.<br />
+		<div class="example">
+			<p class="example_head" id="operator_ex_1a" onmousedown="toggleView(&quot;operator_ex_1a&quot;, &quot;operator_ex_1b&quot;, &quot;example of a binary operator overloading.&quot;);">Show example of a binary operator overloading.</p>
+			<p class="code example_body" id="operator_ex_1b">	
+<span class="comment">// a class for complex numbers</span><br />
+<span class="rword">class complex</span><br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">double</span> re, im;<br />
+}<br />
+<span class="comment">// static constructor for complex number</span><br />
+<span class="rword">complex</span> <span class="func">complex</span>(<span class="rword">double</span> re, im = <span class="real">0.0</span>)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">complex</span> res;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">res</span>.<span class="var">re</span> = <span class="var">re</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">res</span>.<span class="var">im</span> = <span class="var">im</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="var">res</span>;<br />
+}<br />
+<span class="comment">// basic operators</span><br />
+<span class="rword">complex operator</span> + (<span class="rword">complex ref</span> a, b)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="func">complex</span>(<span class="var">a</span>.<span class="var">re</span> + <span class="var">b</span>.<span class="var">re</span>, <span class="var">a</span>.<span class="var">im</span> + <span class="var">b</span>.<span class="var">im</span>);<br />
+}<br />
+<span class="rword">complex operator</span> - (<span class="rword">complex ref</span> a, b)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="func">complex</span>(<span class="var">a</span>.<span class="var">re</span> - <span class="var">b</span>.<span class="var">re</span>, <span class="var">a</span>.<span class="var">im</span> - <span class="var">b</span>.<span class="var">im</span>);<br />
+}<br />
+<span class="rword">complex operator</span> * (<span class="rword">complex ref</span> a, b)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="func">complex</span>(<span class="var">a</span>.<span class="var">re</span> * <span class="var">b</span>.<span class="var">re</span> - <span class="var">a</span>.<span class="var">im</span> * <span class="var">b</span>.<span class="var">im</span>, <span class="var">a</span>.<span class="var">im</span> * <span class="var">b</span>.<span class="var">re</span> + <span class="var">a</span>.<span class="var">re</span> * <span class="var">b</span>.<span class="var">im</span>);<br />
+}<br />
+<span class="rword">complex operator</span> / (<span class="rword">complex ref</span> a, b)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">double</span> magn = <span class="var">b</span>.<span class="var">re</span> * <span class="var">b</span>.<span class="var">re</span> + <span class="var">b</span>.<span class="var">im</span> * <span class="var">b</span>.<span class="var">im</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="func">complex</span>((<span class="var">a</span>.<span class="var">re</span> * <span class="var">b</span>.<span class="var">re</span> + <span class="var">a</span>.<span class="var">im</span> * <span class="var">b</span>.<span class="var">im</span>) / <span class="var">magn</span>, (<span class="var">a</span>.<span class="var">im</span> * <span class="var">b</span>.<span class="var">re</span> - <span class="var">a</span>.<span class="var">re</span> * <span class="var">b</span>.<span class="var">im</span>) / <span class="var">magn</span>);<br />
+}<br />
+<span class="comment">// operator test</span><br />
+<span class="rword">complex</span> a = <span class="func">complex</span>(<span class="real">4</span>, <span class="real">3</span>), b = <span class="func">complex</span>(<span class="real">7</span>, <span class="real">3</span>);<br />
+<span class="rword">auto</span> arr = { <span class="var">a</span> + <span class="var">b</span>, <span class="var">a</span> - <span class="var">b</span>, <span class="var">a * <span class="var">b</span>, <span class="var">a</span> / <span class="var">b</span> };<br />
+			</p>
+		</div>
+		For operator && and || overloads, the second argument must be a type that returns a value of a desired type. Here is an example:<br />
+		<div class="example">
+			<p class="example_head" id="operator_ex_Na" onmousedown="toggleView(&quot;operator_ex_Na&quot;, &quot;operator_ex_Nb&quot;, &quot;example of a && operator overloading.&quot;);">Show example of a && operator overloading.</p>
+			<pre class="code example_body" id="operator_ex_Nb">
+<span class="rword">import </span><span class="var">std</span>.<span class="var">io</span>;
+<span class="rword">class Foo
+</span>{
+<span class="bold">    </span><span class="rword">int </span><span class="vardef">x</span>;
+    <span class="rword">void </span><span class="func">Foo</span><span class="bold">(</span><span class="rword">int </span><span class="var">x</span><span class="bold">){ </span><span class="var">this</span>.<span class="var">x </span>= <span class="var">x</span>; <span class="bold">}
+</span>}
+<span class="rword">Foo </span><span class="func">get</span><span class="bold">(</span><span class="rword">int </span><span class="var">x</span><span class="bold">)
+{
+</span><span class="var">    io</span>.<span class="var">out </span>&lt;&lt; "<span class="string">get() called</span>" &lt;&lt; <span class="var">io</span>.<span class="var">endl</span>;
+<span class="rword">    return </span><span class="func">Foo</span><span class="bold">(</span><span class="var">x</span><span class="bold">);
+}
+</span><span class="rword">bool operator </span>&&<span class="bold">(</span><span class="rword">Foo </span><span class="var">a</span>, <span class="rword">Foo ref</span>() <span class="var">b</span><span class="bold">)
+{
+</span><span class="rword">    return </span><span class="var">a</span>.<span class="var">x </span>&& <span class="func">b</span><span class="bold">()</span>.<span class="var">x</span><span class="bold">;
+}
+</span><span class="rword">return </span><span class="func">get</span><span class="bold">(</span><span class="real">0</span><span class="bold">) </span>&& <span class="func">get</span><span class="bold">(</span><span class="real">1</span><span class="bold">);</span></pre>
+			</p>
+		</div>
+		This is implemented so that a short-circuit behavior of these operators is preserved, if you execute this example, you will see that "get" function is called only once;<br />
+		<br />
+		Following unary operators can be overloaded:<br />
+		+ - ~ !<br />
+		<div class="example">
+			<p class="example_head" id="operator_ex_2a" onmousedown="toggleView(&quot;operator_ex_2a&quot;, &quot;operator_ex_2b&quot;, &quot;example of a unary operator overloading.&quot;);">Show example of a unary operator overloading.</p>
+			<p class="code example_body" id="operator_ex_2b">	
+<span class="comment">// a class for complex numbers</span><br />
+<span class="rword">class complex</span><br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">double</span> re, im;<br />
+}<br />
+<span class="comment">// static constructor for complex number</span><br />
+<span class="rword">complex</span> <span class="func">complex</span>(<span class="rword">double</span> re, im = <span class="real">0.0</span>)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">complex</span> res;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">res</span>.<span class="var">re</span> = <span class="var">re</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">res</span>.<span class="var">im</span> = <span class="var">im</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="var">res</span>;<br />
+}<br />
+<span class="comment">// negate operator overload</span><br />
+<span class="rword">complex operator</span> - (<span class="rword">complex ref</span> a)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="func">complex</span>(-<span class="var">a</span>.<span class="var">re</span>, -<span class="var">a</span>.<span class="var">im</span>);<br />
+}<br />
+<span class="comment">// operator test</span><br />
+<span class="rword">complex</span> a = <span class="func">complex</span>(<span class="real">4</span>, <span class="real">5</span>);<br />
+<span class="rword">complex</span> b = -<span class="var">a</span>;<br />
+<span class="rword">return</span> <span class="var">b</span>.<span class="var">re</span> + <span class="var">b</span>.<span class="var">im</span>; <span class="comment">// -9.0</span><br />
+			</p>
+		</div>
+
+		Function call operator () and array indexing operator [] can be overloaded with arbitrary number of parameters.<br />
+		<br />
+		To get a pointer to an overloaded operator, write an <span class="rword">@</span> before the operators name.<br />
+		<div class="example">
+			<p class="example_head" id="operator_ex_3a" onmousedown="toggleView(&quot;operator_ex_3a&quot;, &quot;operator_ex_3b&quot;, &quot;example of taking function pointer of an overloaded operator.&quot;);">Show example of taking function pointer of an overloaded operator.</p>
+			<pre class="code example_body" id="operator_ex_3b">
+<span class="rword">import </span><span class="var">std</span>.<span class="var">algorithm</span>;
+<span class="rword">import </span><span class="var">std</span>.<span class="var">io</span>;<span class="comment">
+
+// A pair of numbers
+</span><span class="rword">class IntPair
+</span>{
+	<span class="rword">int </span><span class="vardef">a</span>, <span class="vardef">b</span>;
+}<span class="comment">
+// An external constructor
+</span><span class="rword">IntPair </span><span class="func">IntPair</span><span class="bold">(</span><span class="rword">int </span><span class="var">a</span>, <span class="var">b</span><span class="bold">)
+{
+</span>	<span class="rword">IntPair </span><span class="vardef">r</span>;
+	<span class="var">r</span>.<span class="var">a </span>= <span class="var">a</span>;
+	<span class="var">r</span>.<span class="var">b </span>= <span class="var">b</span>;
+	<span class="rword">return </span><span class="var">r</span><span class="bold">;
+}</span><span class="comment">
+// Comparison operator
+</span><span class="rword">int operator </span>==<span class="bold">(</span><span class="rword">IntPair ref </span><span class="var">a</span>, <span class="var">b</span><span class="bold">){ </span><span class="rword">return </span><span class="var">a</span>.<span class="var">a </span>== <span class="var">b</span>.<span class="var">a </span>&& <span class="var">a</span>.<span class="var">b </span>== <span class="var">b</span>.<span class="var">b</span><span class="bold">; }</span><span class="comment">
+// Lexicographical "less" comparison operator
+</span><span class="rword">int operator </span>&lt;<span class="bold">(</span><span class="rword">IntPair ref </span><span class="var">a</span>, <span class="var">b</span><span class="bold">){ </span><span class="rword">return </span><span class="var">a</span>.<span class="var">a </span>== <span class="var">b</span>.<span class="var">a </span>? <span class="var">a</span>.<span class="var">b </span>&lt; <span class="var">b</span>.<span class="var">b </span>: <span class="var">a</span>.<span class="var">a </span>&lt; <span class="var">b</span>.<span class="var">a</span><span class="bold">; }</span><span class="comment">
+// Lexicographical "greater" comparison operator
+</span><span class="rword">int operator </span>&gt;<span class="bold">(</span><span class="rword">IntPair ref </span><span class="var">a</span>, <span class="var">b</span><span class="bold">){ </span><span class="rword">return </span><span class="var">a</span>.<span class="var">a </span>== <span class="var">b</span>.<span class="var">a </span>? <span class="var">a</span>.<span class="var">b </span>&gt; <span class="var">b</span>.<span class="var">b </span>: <span class="var">a</span>.<span class="var">a </span>&gt; <span class="var">b</span>.<span class="var">a</span><span class="bold">; }</span><span class="comment">
+
+// Create an array of objects
+</span><span class="rword">auto </span><span class="vardef">arr </span>= { <span class="func">IntPair</span><span class="bold">(</span><span class="real">2</span>, <span class="real">4</span><span class="bold">)</span>, <span class="func">IntPair</span><span class="bold">(</span><span class="real">5</span>, <span class="real">8</span><span class="bold">)</span>, <span class="func">IntPair</span><span class="bold">(</span><span class="real">2</span>, <span class="real">3</span><span class="bold">)</span>, <span class="func">IntPair</span><span class="bold">(</span><span class="real">3</span>, <span class="real">1</span><span class="bold">)</span>, <span class="func">IntPair</span><span class="bold">(</span><span class="real">0</span>, <span class="real">1</span><span class="bold">)</span>, <span class="func">IntPair</span><span class="bold">(</span><span class="real">9</span>, <span class="real">1</span><span class="bold">) </span>};
+<span class="comment">
+</span><span class="func">sort</span><span class="bold">(</span><span class="var">arr</span>, @<span class="func">&lt;</span><span class="bold">)</span>;<span class="comment"> // Sort from 'smallest' to 'largest'
+</span><span class="rword">for</span>(<span class="vardef">i </span><span class="rword">in </span><span class="var">arr</span>)
+<span class="var">	io</span>.<span class="var">out </span>&lt;&lt; '<span class="string">(</span>' &lt;&lt; <span class="var">i</span>.<span class="var">a </span>&lt;&lt; "<span class="string">, </span>" &lt;&lt; <span class="var">i</span>.<span class="var">b </span>&lt;&lt; "<span class="string">); </span>";
+<span class="var">io</span>.<span class="var">out </span>&lt;&lt; <span class="var">io</span>.<span class="var">endl</span>;<span class="comment">
+// output: (0, 1); (2, 3); (2, 4); (3, 1); (5, 8); (9, 1);
+</span>
+<span class="func">sort</span><span class="bold">(</span><span class="var">arr</span>, @<span class="func">&gt;</span><span class="bold">)</span>;<span class="comment"> // Sort from 'largest' to 'smallest'
+</span><span class="rword">for</span>(<span class="vardef">i </span><span class="rword">in </span><span class="var">arr</span>)
+	<span class="var">io</span>.<span class="var">out </span>&lt;&lt; '<span class="string">(</span>' &lt;&lt; <span class="var">i</span>.<span class="var">a </span>&lt;&lt; "<span class="string">, </span>" &lt;&lt; <span class="var">i</span>.<span class="var">b </span>&lt;&lt; "<span class="string">); </span>";
+<span class="var">io</span>.<span class="var">out </span>&lt;&lt; <span class="var">io</span>.<span class="var">endl</span>;<span class="comment">
+// output: (9, 1); (5, 8); (3, 1); (2, 4); (2, 3); (0, 1);
+</span><span class="rword">
+return </span><span class="real">1</span><span class="bold">;</span></pre>
+		</div>
+	</div>
+	<hr />
+	<div class="subtopic">
+		<h4><a name="coroutine">4.3.9 Coroutines</a></h4>
+
+		Coroutine is a function that can return execution to its caller and when it is called again, resume execution from the point it has left.<br />
+		When function is resumed, its local variable state is restored, but function arguments are equal to the ones that caller passed to it.<br />
+		<br />
+		Coroutine acts like a simple function, until <a href="#yield">yield</a> expression is used.<br />
+		<br />
+		Because <a href="#yield">yield</a> expression can accept a return value, function can virtually return multiple values during its execution.<br />
+		Coroutines can be used to implement cooperative tasks, iterators, infinite lists and pipes.<br />
+		<br />
+		To implement a coroutine, <span class="rword">coroutine</span> must be written before function return type.<br />
+		<div class="example">
+			<p class="example_head" id="coroutine_ex_1a" onmousedown="toggleView(&quot;coroutine_ex_1a&quot;, &quot;coroutine_ex_1b&quot;, &quot;example of an ID generator.&quot;);">Show example of an ID generator.</p>
+			<p class="code example_body" id="coroutine_ex_1b">	
+<span class="comment">// coroutine, that returns different integer IDs every time it is called</span><br />
+<span class="rword">coroutine int</span> <span class="func">generate_id</span>()<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">int</span> ID = <span class="real">0x23efdd67</span>; <span class="comment">// starting ID</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// 'infinite' loop will return IDs</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">while</span>(<span class="real">1</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">yield</span> <span class="var">ID</span>; <span class="comment">// return ID</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">ID</span>++; <span class="comment">// move to the next ID</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+}<br />
+<span class="rword">int</span> a = <span class="func">generate_id</span>(); <span class="comment">// 0x23efdd67</span><br />
+<span class="rword">int</span> b = <span class="func">generate_id</span>(); <span class="comment">// 0x23efdd68</span><br />
+			</p>
+		</div>
+		
+		<div class="example">
+			<p class="example_head" id="coroutine_ex_2a" onmousedown="toggleView(&quot;coroutine_ex_2a&quot;, &quot;coroutine_ex_2b&quot;, &quot;example of a random number generator.&quot;);">Show example of a random number generator.</p>
+			<p class="code example_body" id="coroutine_ex_2b">	
+<span class="comment">// coroutine, that returns pseudo-random numbers in a range (0..32767)</span><br />
+<span class="rword">coroutine int</span> <span class="func">rand</span>()<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// starting seed</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">int</span> current = <span class="real">1</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// 'infinite' loop will return pseudo-random numbers</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">while</span>(<span class="real">1</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">current</span> = <span class="var">current</span> * <span class="real">1103515245</span> + <span class="real">12345</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">yield</span> (<span class="var">current</span> >> <span class="real">16</span>) & <span class="real">32767</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+}<br />
+<span class="comment">// Generate an array of eight pseudo-random numbers </span><br />
+<span class="rword">int</span>[<span class="real">8</span>] array;<br />
+<span class="rword">for</span>(i <span class="rword">in</span> <span class="var">array</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">i</span> = <span class="func">rand</span>();<br />
+			</p>
+		</div>
+		It is possible to return coroutines as closures, to create generators with extra context.<br />
+		<div class="example">
+			<p class="example_head" id="coroutine_ex_3a" onmousedown="toggleView(&quot;coroutine_ex_3a&quot;, &quot;coroutine_ex_3b&quot;, &quot;example of a forward iterator over vector contents.&quot;);">Show example of a forward iterator over vector contents.</p>
+			<p class="code example_body" id="coroutine_ex_3b">	
+<span class="rword">import std.vector;</span><br />
+<span class="comment">// Function will return forward iterator over vectors' values</span><br />
+<span class="rword">auto</span> <span class="func">forward_iterator</span>(<span class="rword">vector ref</span> x)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Every time the coroutine is called, it will return vector element and advance to the next</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">coroutine auto ref</span> <span class="func">iterate</span>()<br />
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Loop over all elements</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">for</span>(<span class="rword">int</span> i = <span class="real">0</span>; <span class="var">i</span> < <span class="var">x</span>.<span class="func">size</span>(); <span class="var">i</span>++)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">yield</span> <span class="var">x</span>[<span class="var">i</span>]; <span class="comment">// and return them one after the other</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// return statement can still be used in a coroutine.</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="rword">nullptr</span>; <span class="comment">// return null pointer to mark the end</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// return iterator function</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="var">iterate</span>;<br />
+}<br />
+<span class="comment">// create vector and add some numbers to it</span><br />
+<span class="rword">vector</span> a = <span class="func">vector</span>(<span class="rword">int</span>);<br />
+<span class="var">a</span>.<span class="func">push_back</span>(<span class="real">4</span>);<br />
+<span class="var">a</span>.<span class="func">push_back</span>(<span class="real">5</span>);<br />
+<span class="var">a</span>.<span class="func">push_back</span>(<span class="real">40</span>);<br />
+<br />
+<span class="comment">// Create iterator</span><br />
+<span class="rword">auto</span> it = <span class="func">forward_iterator</span>(<span class="var">a</span>);<br />
+<br />
+<span class="comment">// Find sum of all vector elements</span><br />
+<span class="rword">int</span> sum = <span class="real">0</span>;<br />
+<span class="rword">auto ref</span> x; <span class="comment">// variable to hold the pointer to current element</span><br />
+<span class="rword">while</span>(<span class="var">x</span> = <span class="func">it</span>()) <span class="comment">// iterate through all elements</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">sum</span> += <span class="func">int</span>(<span class="var">x</span>); <span class="comment">// and add them together</span><br />
+<br />
+<span class="rword">return</span> <span class="var">sum</span>; <span class="comment">// 49</span><br />
+			</p>
+		</div>
+		Using closures, lets rewrite pseudo-random number generator example to support multiple random generators with different seed in parallel.<br />
+		<div class="example">
+			<p class="example_head" id="coroutine_ex_4a" onmousedown="toggleView(&quot;coroutine_ex_4a&quot;, &quot;coroutine_ex_4b&quot;, &quot;example of parallel random number generators.&quot;);">Show example of parallel random number generators.</p>
+			<p class="code example_body" id="coroutine_ex_4b">
+<span class="comment">// Function will return pseudo-random number generator with selected starting seed</span><br />
+<span class="rword">auto</span> <span class="func">get_rng</span>(<span class="rword">int</span> seed)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// coroutine, that returns pseudo-random numbers in a range (0..32767)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">coroutine int</span> <span class="func">rand</span>()<br />
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// starting seed</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">int</span> current = <span class="var">seed</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// 'infinite' loop will return pseudo-random numbers</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">while</span>(<span class="real">1</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">current</span> = <span class="var">current</span> * <span class="real">1103515245</span> + <span class="real">12345</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">yield</span> (<span class="var">current</span> >> <span class="real">16</span>) & <span class="real">32767</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="var">rand</span>;<br />
+}<br />
+<span class="comment">// Create two pseudo-random number generators</span><br />
+<span class="rword">auto</span> rngA = <span class="func">get_rng</span>(<span class="real">1</span>);<br />
+<span class="rword">auto</span> rngB = <span class="func">get_rng</span>(<span class="real">0xdeaf</span>);<br />
+<br />
+<span class="comment">// Generate an array of eight pseudo-random numbers </span><br />
+<span class="rword">int</span>[<span class="real">8</span>] array;<br />
+<span class="rword">for</span></span>(<span class="rword">int</span> i = <span class="real">0</span>; <span class="var">i</span> < <span class="var">array</span>.<span class="var">size</span> / <span class="real">2</span>; <span class="var">i</span>++) <span class="comment">// one half - using first RNG</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">array</span>[<span class="var">i</span>] = <span class="func">rngA</span>();<br />
+<span class="rword">for</span></span>(<span class="rword">int</span> i = <span class="var">array</span>.<span class="var">size</span> / <span class="real">2</span>; <span class="var">i</span> < <span class="var">array</span>.<span class="var">size</span>; <span class="var">i</span>++) <span class="comment">// second half - using second RNG</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">array</span>[<span class="var">i</span>] = <span class="func">rngB</span>();<br />
+			</p>
+		</div>
+	</div>
+	<hr />
+	<div class="subtopic">
+		<h4><a name="generic">4.3.10 Generic functions</a></h4>
+		
+		Sometimes there is a need for a function that can work for a large set or different types and not be restricted to run-time operations supported with "auto ref" type.<br />
+		These functions are called <b>generic</b>.<br />
+		To create a generic function, just use <span class="rword">generic</span> keyword as the argument type.<br />
+		Here is an example of a "map" function, which transforms all array elements by applying a function to them.<br />
+		<pre class="code">
+</span><span class="rword">import </span><span class="var">std</span>.<span class="var">vector</span>;
+<span class="comment">
+</span><span class="rword">void </span><span class="func">map</span><span class="bold">(</span><span class="rword">generic </span><span class="var">array</span>, <span class="rword">generic </span><span class="var">function</span><span class="bold">)
+{
+</span><span class="comment">	</span><span class="rword">for</span>(<span class="vardef">i </span><span class="rword">in </span><span class="var">array</span>)<span class="comment"> // for every element in an array
+		</span><span class="var">i </span>= <span class="func">function</span><span class="bold">(</span><span class="var">i</span><span class="bold">)</span>;<span class="comment"> // transform it using the function
+</span><span class="bold">}
+</span><span class="rword">auto </span><span class="vardef">arr1 </span>= { <span class="real">1</span>, <span class="real">2</span>, <span class="real">3</span>, <span class="real">4 </span>};
+<span class="rword">auto </span><span class="vardef">arr2 </span>= { <span class="real">1.0</span>, <span class="real">2.0</span>, <span class="real">3.0</span>, <span class="real">4.0 </span>};
+<span class="func">map</span><span class="bold">(</span><span class="var">arr1</span>, <span class="rword">auto</span><span class="bold">(</span><span class="rword">int </span><span class="var">x</span><span class="bold">){ </span><span class="rword">return </span>-<span class="var">x</span><span class="bold">; })</span>;
+<span class="func">map</span><span class="bold">(</span><span class="var">arr2</span>, <span class="rword">auto</span><span class="bold">(</span><span class="rword">double </span><span class="var">x</span><span class="bold">){ </span><span class="rword">return </span>-<span class="var">x</span><span class="bold">; })</span>;
+<span class="bold">
+</span><span class="rword">return </span><span class="real">0</span><span class="bold">;</span></pre>
+		<br />
+		If you want to force an argument to be a reference type, you can use <span class="rword">generic ref</span> type.<br />
+		For example, you may write a generic swap function:<br />
+		<pre class="code">
+<span class="rword">void </span><span class="func">swap</span><span class="bold">(</span><span class="rword">generic ref </span><span class="var">a</span>, <span class="rword">generic ref </span><span class="var">b</span><span class="bold">)
+{
+</span><span class="rword">	typeof</span>(<span class="var">b</span>).<span class="rword">target </span><span class="vardef">tmp </span>= *<span class="var">a</span>;
+	*<span class="var">a </span>= *<span class="var">b</span>;
+	*<span class="var">b </span>= <span class="var">tmp</span>;
+<span class="bold">}
+</span><span class="rword">int </span><span class="vardef">a </span>= <span class="real">0</span>, <span class="vardef">b </span>= <span class="real">0</span>;
+<span class="func">swap</span><span class="bold">(</span><span class="var">a</span>, <span class="real">8</span><span class="bold">)</span>;<span class="comment"> // a == 8; b == 0;
+</span><span class="func">swap</span><span class="bold">(</span><span class="real">4</span>, <span class="var">b</span><span class="bold">)</span>;<span class="comment"> // a == 8; b == 4;
+</span><span class="func">swap</span><span class="bold">(</span><span class="var">a</span>, <span class="var">b</span><span class="bold">)</span>;<span class="comment"> // a == 4; b == 8;
+</span><span class="rword">return </span><span class="var">a </span>- <span class="var">b</span><span class="bold">;</span><span class="comment"> // -4
+</span></pre>
+		If you wish to reference a generic argument type later, you can use a generic type alias in a form of @ followed by alias name:<br />
+		<pre class="code">
+<span class="comment">// function that creates an array and fills it with a specified value
+</span><span class="rword">auto </span><span class="func">create</span><span class="bold">(</span>@<span class="rword">T </span><span class="var">x</span>, <span class="rword">int </span><span class="var">y</span><span class="bold">)
+{
+</span><span class="comment">    </span><span class="rword">auto </span><span class="vardef">array </span>= <span class="rword">new T</span>[<span class="var">x</span>];
+<span class="comment">    </span><span class="rword">for</span>(<span class="vardef">i </span><span class="rword">in </span><span class="var">array</span>)
+<span class="comment">        </span><span class="var">i </span>= <span class="var">x</span>;
+<span class="comment">    </span><span class="rword">return </span><span class="var">array</span><span class="bold">;
+}
+</span><span class="rword">auto </span><span class="vardef">a </span>= <span class="func">create</span><span class="bold">(</span><span class="real">4</span>, <span class="real">16</span><span class="bold">)</span>;</pre>
+	</div>
+	<div class="subtopic">
+		<h4><a name="genericspec">4.3.11 Generic function specialization</a></h4>
+		
+		It is possible to specialize generic functions for a specific group of types they are used on, for example, to create a generic function that accepts
+		any instance of a generic class of a function that accepts a specified amount of arguments or return a specified type.<br />
+		To perform generic function specialization, just replace generic type argument, function type argument or function return type with either
+		<span class="rword">generic</span> type, <span class="rword">generic ref</span> type or a generic type alias in a form of @ followed by alias name.<br />
+		<br />
+		Let's take for example a generic complex class:<br />
+		<pre class="code">
+<span class="rword">class complex</span>&lt;<span class="rword">T</span>&gt;
+{
+    <span class="rword">T </span><span class="vardef">re</span>, <span class="vardef">im<span class="comment">
+    // constructor
+</span><span class="rword">    void </span><span class="func">complex</span><span class="bold">(</span><span class="rword">T </span><span class="var">a</span>, <span class="var">b</span><span class="bold">){ </span><span class="var">re </span>= <span class="var">a</span>; <span class="var">im </span>= <span class="var">b</span>; <span class="bold">}
+</span>}</pre>
+		Now, we add an overload for unary '-' operator that is called only for our complex number class:<br />
+		<pre class="code">
+<span class="comment">// overloaded negation operator, specialized for complex number class
+</span><span class="rword">auto operator</span>-<span class="bold">(</span><span class="rword">complex</span>&lt;<span class="rword">generic</span>&gt; <span class="rword">ref </span><span class="var">c</span><span class="bold">)
+{
+</span><span class="comment">    </span><span class="rword">return </span><span class="func">complex&lt;typeof(c.re)&gt;</span><span class="bold">(</span>-<span class="var">c</span>.<span class="var">re</span>, -<span class="var">c</span>.<span class="var">im</span><span class="bold">);
+}</span><span class="comment">
+// create a test number
+</span><span class="rword">auto </span><span class="vardef">a </span>= <span class="func">complex&lt;float&gt;</span><span class="bold">(</span><span class="real">2</span>, <span class="real">3</span><span class="bold">)</span>;<span class="comment">
+// negate it
+</span><span class="rword">auto </span><span class="vardef">b </span>= -<span class="var">a</span>;<span class="comment">
+// result is -5.0
+</span><span class="rword">return </span><span class="var">b</span>.<span class="var">re </span>+ <span class="var">b</span>.<span class="var">im</span><span class="bold">;</span></pre>
+		The code can be improved by using a generic type alias:<br />
+		<pre class="code">
+<span class="rword">auto operator</span>-<span class="bold">(</span><span class="rword">complex</span>&lt;@<span class="rword">T</span>&gt; <span class="rword">ref </span><span class="var">c</span><span class="bold">)
+{
+    </span><span class="rword">return </span><span class="func">complex&lt;T&gt;</span><span class="bold">(</span>-<span class="var">c</span>.<span class="var">re</span>, -<span class="var">c</span>.<span class="var">im</span><span class="bold">);
+}</span></pre>
+		Generic type aliases follow an important rule: equal type aliases in a generic function argument list must resolve to equal type at the call site.<br />
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="arrunsized">4.4 Arrays with implicit size</a></h3>
+
+	Array with implicit type is defined like this:
+	<p class="code">
+		<span class="rword">type</span>[] name;
+	</p>
+	Any array of the same type can be assigned to an array with implicit size.<br />
+	<p class="code">
+		<span class="rword">int</span>[<span class="real">7</span>] arr1;<br />
+		<span class="rword">int</span>[<span class="real">4</span>] arr2;<br />
+		<span class="rword">int</span>[] arr1a = arr1;<br />
+		arr1a = arr2;
+	</p>
+	<p class="code">
+		<span class="rword">int</span>[<span class="real">7</span>][<span class="real">3</span>] arr1;<br />
+		<span class="rword">int</span>[<span class="real">4</span>][<span class="real">3</span>] arr2;<br />
+		<span class="rword">int</span>[][<span class="real">3</span>] arr1a = arr1;<br />
+		arr1a = arr2;
+	</p>
+	type[] consists of a pointer to an array and a size field.<br />
+	To get array size, use its "size" field:<br />
+	<p class="code">
+		<span class="rword">int</span> count = arr1a.size;
+	</p>
+</div>
+<hr />
+
+<div class="topic">
+	<h3><a name="enum">4.5 Enumeration</a></h3>
+	
+	Enumeration type or enum is a class that groups a list of named constant numbers.<br />
+	Enumeration is defined by writing <span class="rword">enum</span>, followed by enumeration name and a list of comma-separated constants in a {}:<br />
+	<pre class="code">
+<span class="rword">enum Foo</span>{ <span class="vardef">A </span>= <span class="real">5</span>, <span class="vardef">B </span>= <span class="real">8</span>, <span class="vardef">C </span>= <span class="real">15 </span>}
+<span class="rword">Foo </span><span class="vardef">x </span>= <span class="rword">Foo</span>.<span class="var">B</span>;</pre>
+	Constant value is of type int.<br />
+	Constant value can be skipped, in which case its value will be determined by incrementing previous constant value:<br />
+	<pre class="code">
+<span class="comment">// define Foo.A to be 4, Foo.B to be 5 and so on:
+</span><span class="rword">enum Foo</span>{ <span class="vardef">A </span>= <span class="real">4</span>, <span class="vardef">B</span>, <span class="vardef">C</span>, <span class="vardef">D </span>}</pre>
+	Moreover, if the value of first constant is skipped, its value will be 0:<br />
+	<pre class="code">
+<span class="comment">
+// define Foo.A to be 0, Foo.B to be 1 and so on:
+</span><span class="rword">enum Foo</span>{ <span class="vardef">A</span>, <span class="vardef">B</span>, <span class="vardef">C</span>, <span class="vardef">D </span>}</pre>
+	<br />
+	Compiler will generate the following functions to enable conversion to and from int:<br />
+	<pre class="code">
+<span class="rword">int </span><span class="func">int</span><span class="bold">(</span><span class="rword">enum_type </span><span class="var">x</span><span class="bold">);
+</span><span class="rword">enum_type </span><span class="func">enum_type</span><span class="bold">(</span><span class="rword">int </span><span class="var">x</span><span class="bold">);
+</span></pre>
+</div>
+<hr />
+
+<div class="topic">
+	<h3><a name="namespace">4.6 Namespaces</a></h3>
+	
+	A list of declarations and expressions can be enclosed in a namespace.<br />
+	To access something from outside a namespace, a namespace name followed by '.' must be written before an identifier name:
+	<pre class="code">
+<span class="rword">namespace Space
+</span>{
+    <span class="rword">class Pair
+</span>    {
+        <span class="rword">int </span><span class="vardef">x</span>, <span class="vardef">y</span>;
+    }
+    <span class="rword">Pair </span><span class="vardef">x</span>;
+    <span class="var">x</span>.<span class="var">x </span>= <span class="real">5</span>;
+}
+<span class="rword">Space</span>.<span class="rword">Pair </span><span class="vardef">y</span>;
+<span class="var">y</span>.<span class="var">x </span>= <span class="real">10</span>;
+<span class="rword">return </span><span class="var">y</span>.<span class="var">x </span>+ <span class="rword">Space</span>.<span class="var">x</span>.<span class="var">x</span><span class="bold">;</span><span class="comment"> // 15
+</span></pre>
+	<br />
+	Namespace can be defined at the global scope or immediately inside another namespace. A short-hand syntax for declaring nested namespaces exists.<br />
+	Following example defines two variables inside the same namespace:
+	<pre class="code">
+<span class="rword">namespace A
+</span>{
+    <span class="rword">namespace B
+</span>    {
+        <span class="rword">int </span><span class="vardef">x </span>= <span class="real">5</span>;
+    }
+}
+<span class="rword">namespace A</span>.<span class="rword">B
+</span>{
+    <span class="rword">int </span><span class="vardef">y </span>= <span class="real">10</span>;
+}
+<span class="rword">return A</span>.<span class="rword">B</span>.<span class="var">x </span>+ <span class="rword">A</span>.<span class="rword">B</span>.<span class="var">y</span><span class="bold">;</span><span class="comment"> // 15</span></pre>
+	Identifier search goes as follows: first, the name is searched starting at current namespace; then, the name is searched starting at parent namespace and so on, until global namespace is reached:
+	<pre class="code">
+<span class="rword">namespace A
+</span>{
+    <span class="rword">namespace B
+</span>    {
+        <span class="rword">int </span><span class="vardef">x </span>= <span class="real">5</span>;
+    }
+    <span class="rword">namespace C
+    </span>{
+    <span class="comment">    </span><span class="rword">namespace D
+    </span><span class="comment">    </span>{<span class="comment">
+            // Name search order:
+            // A.C.D.B.x - not found
+            // A.C.B.x - not found
+            // A.B.x - found
+        </span><span class="rword">    int </span><span class="vardef">y </span>= <span class="rword">B</span>.<span class="var">x</span>;
+        }
+    }
+}</pre>
+</div>
+<hr />
+
+<h2 align="center">5. Special types</h2>
+<div class="topic">
+	<h3><a name="autoref">5.1 auto ref</a></h3>
+
+	<span class="rword">auto ref</span> type is a pointer with implicit type.<br />
+	Pointer of any type can be assigned to <span class="rword">auto ref</span>.<br />
+	To retrieve target type, you can use <span class="func">typeid</span>() function.<br />
+	When type conversions are made, type checking is performed at run time.<br />
+	<div class="example">
+		<p class="example_head" id="autoref_ex_1a" onmousedown="toggleView(&quot;autoref_ex_1a&quot;, &quot;autoref_ex_1b&quot;, &quot;example of various assignments to auto ref type.&quot;);">Show example of various assignments to auto ref type.</p>
+		<p class="code example_body" id="autoref_ex_1b">
+<span class="rword">int</span> x = <span class="real">4</span>;<br />
+<span class="rword">float</span> y = <span class="real">8</span>;<br />
+<span class="rword">auto ref</span> z;<br />
+<span class="var">z</span> = &<span class="var">x</span>; <span class="comment">// z points to int x, typeid(z) == int</span><br />
+<span class="var">z</span> = &<span class="var">y</span>; <span class="comment">// now z points to float y, typeid(z) == float</span><br />
+		</p>
+	</div>
+	Every type has a default constructor from <span class="rword">auto ref</span> type, which can be overridden with a custom one.<br />
+	Default reference type constructor makes a successful conversion if <span class="rword">auto ref</span> target type is equal to reference target type.<br />
+	Default constructor of other types makes a successful conversion if type is equal to <span class="rword">auto ref</span> target type.<br />
+	<div class="example">
+		<p class="example_head" id="autoref_ex_2a" onmousedown="toggleView(&quot;autoref_ex_2a&quot;, &quot;autoref_ex_2b&quot;, &quot;example of type constructor from auto ref type.&quot;);">Show example of type constructor from auto ref type.</p>
+		<p class="code example_body" id="autoref_ex_2b">
+<span class="rword">int</span> x = <span class="real">4</span>;<br />
+<span class="rword">auto ref</span> z = &<span class="var">x</span>;<br />
+<span class="rword">return</span> <span class="func">int</span>(<span class="var">z</span>); <span class="comment">// returns 4</span><br />
+		</p>
+	</div>
+	<div class="example">
+		<p class="example_head" id="autoref_ex_2ab" onmousedown="toggleView(&quot;autoref_ex_2ab&quot;, &quot;autoref_ex_2bb&quot;, &quot;example of reference type constructor from auto ref type.&quot;);">Show example of reference type constructor from auto ref type.</p>
+		<p class="code example_body" id="autoref_ex_2bb">
+<span class="rword">int</span> <span class="func">negate</span>(<span class="rword">int ref</span> x){ <span class="rword">return</span> -(*<span class="var">x</span>); }<br />
+<span class="rword">int</span> x = <span class="real">4</span>;<br />
+<span class="rword">auto ref</span> y = &<span class="var">x</span>;<br />
+<span class="rword">return</span> <span class="func">negate</span>(<span class="func">int ref</span>(<span class="var">y</span>)); <span class="comment">// returns -4</span><br />
+		</p>
+	</div>
+	<div class="example">
+		<p class="example_head" id="autoref_ex_3a" onmousedown="toggleView(&quot;autoref_ex_3a&quot;, &quot;autoref_ex_3b&quot;, &quot;example of custom type constructor from auto ref type.&quot;);">Show example of custom type constructor from auto ref type.</p>
+		<p class="code example_body" id="autoref_ex_3b">
+<span class="comment">// Define custom constructor from auto ref for float type</span><br />
+<span class="rword">float</span> <span class="func">float</span>(<span class="rword">auto ref</span> x)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// If typeid is int, use default int constructor </span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">if</span>(<span class="func">typeid</span>(<span class="var">x</span>) == <span class="rword">int</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="func">int</span>(<span class="var">x</span>);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Otherwise, fallback to default behavior</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">float ref</span> f = <span class="var">x</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> *<span class="var">f</span>;<br />
+}<br />
+<br />
+<span class="rword">int</span> x = <span class="real">4</span>;<br />
+<span class="rword">auto ref</span> ptr = &<span class="var">x</span>;<br />
+<br />
+<span class="comment">// Use our custom constructor</span><br />
+<span class="rword">float</span> e = <span class="func">float</span>(<span class="var">ptr</span>);<br />
+<span class="rword">float</span> y = <span class="real">8</span>;<br />
+<span class="var">ptr</span> = &<span class="var">y</span>;<br />
+<span class="comment">// Test default behavior in our custom constructor</span><br />
+<span class="rword">float</span> f = <span class="func">float</span>(<span class="var">ptr</span>);<br />
+<span class="rword">return</span> <span class="var">e</span> + <span class="var">f</span>; <span class="comment">// returns 12.0</span><br />
+		</p>
+	</div>
+	Value to which <span class="rword">auto ref</span> points to can be changed by either converting it to pointer of known type and working with it,
+	or by using dereference operator *.<br />
+	It latter case, right-hand value type must be equal to <span class="rword">auto ref</span> target type and modification-assignment operators cannot be used.<br />
+	<div class="example">
+		<p class="example_head" id="autoref_ex_4a" onmousedown="toggleView(&quot;autoref_ex_4a&quot;, &quot;autoref_ex_4b&quot;, &quot;example of value assignment to auto ref type.&quot;);">Show example of value assignment to auto ref type.</p>
+		<p class="code example_body" id="autoref_ex_4b">
+<span class="rword">int</span> x = <span class="real">4</span>;<br />
+<span class="rword">auto ref</span> z = &<span class="var">x</span>;<br />
+*<span class="var">z</span> = <span class="real">8</span>;<br />
+<span class="rword">return</span> <span class="func">int</span>(<span class="var">z</span>); <span class="comment">// returns 8</span><br />
+		</p>
+	</div>
+	When <span class="rword">auto ref</span> is used as a function argument, not only pointers, but also value types can be passed through that argument.
+	<div class="example">
+		<p class="example_head" id="autoref_ex_5a" onmousedown="toggleView(&quot;autoref_ex_5a&quot;, &quot;autoref_ex_5b&quot;, &quot;example of extra implicit conversions when auto ref is a function argument type.&quot;);">Show example of extra implicit conversions when auto ref is a function argument type.</p>
+		<p class="code example_body" id="autoref_ex_5b">
+<span class="rword">int</span> <span class="func">sum</span>(<span class="rword">auto ref</span> <span class="var">a</span>, <span class="var">b</span>)<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">return</span> <span class="func">int</span>(<span class="var">a</span>) + <span class="func">int</span>(<span class="var">b</span>);<br />
+}<br />
+<span class="rword">int</span> x = <span class="real">5</span>;<br />
+<span class="rword">return</span> <span class="func">sum</span>(<span class="var">x</span>, <span class="real">12</span>); <span class="comment">// returns 17</span><br />
+		</p>
+	</div>
+	When new variable is defined, its value can be taken from <span class="rword">auto ref</span> type if <span class="rword">auto ref</span> target type matches new variable type.<br />
+	<div class="example">
+		<p class="example_head" id="autoref_ex_6a" onmousedown="toggleView(&quot;autoref_ex_6a&quot;, &quot;autoref_ex_6b&quot;, &quot;example of conversion between type and auto ref.&quot;);">Show example of conversion between type and auto ref.</p>
+		<p class="code example_body" id="autoref_ex_6b">
+<span class="rword">int</span> x = <span class="real">5</span>;<br />
+<span class="rword">auto ref</span> ptr = &<span class="var">x</span>;<br />
+<span class="rword">int</span> z = <span class="var">ptr</span>;<br />
+<span class="rword">return</span> <span class="var">x</span> * <span class="var">z</span>;<br />
+		</p>
+	</div>
+	<div class="subtopic">
+		<h4><a name="autorefcall">5.1.1 function call through auto ref</a></h4>
+		
+		It is possible to make a member function call of an object <span class="rword">auto ref</span> points to.<br />
+		When member function call is made, all member functions with selected name are taken from all classes and the one that fits best is selected.<br />
+		In runtime, function with the same arguments as the selected will be required from <span class="rword">auto ref</span> target type to make a call.<br />
+		<div class="example">
+			<p class="example_head" id="autorefcall_ex_1a" onmousedown="toggleView(&quot;autorefcall_ex_1a&quot;, &quot;autorefcall_ex_1b&quot;, &quot;example of member function call through auto ref.&quot;);">Show example of member function call through auto ref.</p>
+			<p class="code example_body" id="autorefcall_ex_1b">
+<span class="rword">import</span> std.io;<br />
+<span class="rword">class</span> <span class="rword">A</span><br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">void</span> <span class="func">run</span>(<span class="rword">int</span> <span class="var">x</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">io</span>.<span class="var">out</span> << "<span class="string">A int </span>" << <span class="var">x</span> << <span class="var">io</span>.<span class="var">endl</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+}<br />
+<span class="rword">class</span> <span class="rword">B</span><br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">void</span> <span class="func">run</span>(<span class="rword">int</span> <span class="var">x</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">io</span>.<span class="var">out</span> << "<span class="string">B int </span>" << <span class="var">x</span> << <span class="var">io</span>.<span class="var">endl</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+}<br />
+<span class="rword">A</span> a;<br />
+<span class="rword">B</span> b;<br />
+<span class="rword">auto ref</span>[<span class="real">2</span>] arr;<br />
+<span class="var">arr</span>[<span class="real">0</span>] = &<span class="var">a</span>;<br />
+<span class="var">arr</span>[<span class="real">1</span>] = &<span class="var">b</span>;<br />
+<span class="comment">/* Outputs:<br />
+A int 5<br />
+B int 5<br />
+*/<br /></span>
+<span class="rword">for</span>(<span class="var">i</span> <span class="rword">in</span> <span class="var">arr</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">i</span>.<span class="func">run</span>(<span class="real">5</span>);<br />
+<span class="rword">return</span> <span class="real">0</span>;<br />
+			</p>
+		</div>
+		Because target type is known only at runtime, there are some limitations:<br />
+		a) Default argument values are unavailable.<br />
+		b) Function overload is selected at compilation time and implicit type conversions are not made at runtime.<br />
+		If we change <span class="code"><span class="rword">B</span>::<span class="func">run</span></span> function in the example above to
+		<span class="code"><span class="rword">void</span> <span class="func">run</span>(<span class="rword">double</span> <span class="var">x</span>){ <span class="var">io</span>.<span class="var">out</span> << "<span class="string">B double </span>" << <span class="var">x</span> << <span class="var">io</span>.<span class="var">endl</span>; }</span>
+		, then we will get a following error at runtime:<br />
+		<span class="code">ERROR: type '<span class="rword">B</span>' doesn't implement method '<span class="rword">B</span>::<span class="func">run</span>' of type '<span class="rword">void ref</span>(<span class="rword">int</span>)'</span><br />
+		</div>
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="autoarray">5.2 auto[]</a></h3>
+
+	<span class="rword">auto</span>[] type is an array with implicit type.<br />
+	<br />
+	Following <b>explicit</b> conversions are supported (all checks are done in run-time):<br />
+	<p class="code">
+		<span class="rword">type</span>[] = <span class="rword">auto</span>[]; <span class="comment">// auto[] element type must be equal to type</span><br />
+		<span class="rword">type</span>[<span class="real">N</span>] = <span class="rword">auto</span>[]; <span class="comment">// auto[] element type and array size must be equal</span><br />
+		<span class="rword">auto</span>[] = <span class="rword">type</span>[];<br />
+		<span class="rword">auto</span>[] = <span class="rword">type</span>[<span class="real">N</span>];<br />
+	</p>
+	<span class="rword">auto</span>[] array indexing operator[] returns <span class="rword">auto ref</span> type with a pointer to selected element.<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="typeid">5.3 typeid</a></h3>
+
+	<span class="rword">typeid</span> type is a type identifier that can be used to get run-time type information (RTTI).<br />
+	Value with type of typeid is generated if type name or <a href="#typeof">typeof</a> is used in expression.<br />
+	typeid constructor from <span class="rword">auto ref</span> type returns the type that <span class="rword">auto ref</span> points to. <a href="#convimplicit">Implicit conversions</a> to <span class="rword">auto ref</span> type still stand.<br />
+	<p class="code">
+<span class="rword">typeid</span> x = <span class="func">typeof</span>(<span class="real">4</span>); <span class="comment">// typeid of expression is returned at compilation time</span><br />
+<span class="rword">typeid</span> y = <span class="func">typeid</span>(<span class="real">4</span>); <span class="comment">// typeid of expression is returned at run time</span><br />
+<span class="rword">typeid</span> z = <span class="rword">int</span>; <span class="comment">// type name used as expression</span><br />
+<span class="rword">return</span> <span class="var">x</span> == <span class="var">z</span> && <span class="var">y</span> == <span class="var">z</span>; <span class="comment">// 1</span><br />
+	</p>
+	Only comparison of typeid is available by default. To get extended run-time type information, import <a href="#std_typeinfo">std.typeinfo</a> module.<br />
+</div>
+<hr />
+
+<h2 align="center">6. Miscellaneous</h2>
+<div class="topic">
+	<h3><a name="characters">6.1 Characters</a></h3>
+
+	Characters are enclosed in single quotes ''.<br />
+	No more than one character can be inside quotes (after processing <a href="#escapeseq" title="Escape sequences">escape sequences</a>).<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="strings">6.2 Strings</a></h3>
+
+	Strings are enclosed in double quotes "".<br />
+	Type of string is array of (length + 1) character.<br />
+	Strings are 0-terminated.<br />
+	
+	<div class="subtopic">
+		<h4><a name="unescaped">6.2.1 Unescaped strings</a></h4>
+
+		If a character @ is written before string, the contents of that string will not be escaped.<br />
+		@"\w\\\w" is equal to "\\w\\\\\\w".<br />
+		It is not possible to use a double quote inside an unescaped string literal.<br />
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="arrayinline">6.3 Inline arrays</a></h3>
+
+	Arrays can be defined by writing all array elements, separated by commas in a { } block.<br />
+	Multidimensional array can be also defined by using this.<br />
+	<br />
+	It is possible to create multidimensional array, where arrays have different sizes:<br />
+	<p class="code">
+<span class="rword">auto</span> arr1 = { { <span class="real">2</span>, <span class="real">3</span> }, { <span class="real">4</span> }, { <span class="real">7</span>, <span class="real">8</span>, <span class="real">9</span>, <span class="real">10</span> } };<br />
+<span class="rword">auto</span> arr2 = { &quot;<span class="string">Mark</span>&quot;, &quot;<span class="string">Frank</span>&quot;, &quot;<span class="string">Katherine</span>&quot; };
+	</p>
+	
+	<div class="subtopic">
+		<h4><a name="listcomprehension">6.3.1 List comprehension</a></h4>
+
+		List comprehension is a way to generate list with an arbitrary number of elements using an expression with a custom rules.<br />
+		For example, one may generate an array of 32 squared numbers by writing:
+		<p class="code">
+<span class="rword">int</span>[] sq = { <span class="rword">for</span>(i in <span class="func">range</span>(<span class="real">1</span>, <span class="real">32</span>)) <span class="rword">yield</span> i*i; };
+		</p>
+		A list comprehension is an inline array that starts with a <a href="#for">for expression</a>.<br />
+		Every value that is <a href="#yield">yield</a> in a list comprehension is added to the array.<br />
+		Explicit <a href="#return">return expression</a> will stop array element generation and the value returned <b>is ignored</b>.<br />
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="escapeseq">6.4 Escape sequences</a></h3>
+	Escape sequences can be used inside character and string expressions.<br />
+	Following escape sequences are supported:<br />
+	<table border="1px">
+		<tr><th>Sequence</th><th>Meaning</th></tr>
+		<tr><td>\n</td><td>CR (Carriage return)</td></tr>
+		<tr><td>\r</td><td>LF (Line feed)</td></tr>
+		<tr><td>\t</td><td>Tab</td></tr>
+		<tr><td>\0</td><td>0</td></tr>
+		<tr><td>\'</td><td>single quote - '</td></tr>
+		<tr><td>\"</td><td>double quote - "</td></tr>
+		<tr><td>\\</td><td>backslash - \</td></tr>
+	</table>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="binnum">6.5 Binary numbers</a></h3>
+
+	Numbers can be written in binary, and must be followed by letter 'b':<br />
+	101b == 5<br />
+	If <span class="rword">int</span> type is insufficient to represent the binary constant as a positive number, then the type is <span class="rword">long</span>, otherwise it's <span class="rword">int</span>.<br />
+	If <span class="rword">long</span> type is insufficient to represent the binary constant as a positive number, and then if <span class="rword">int</span> type can represent the binary constant as a negative number, the type is <span class="rword">int</span>, otherwise it's <span class="rword">long</span>.<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="octnum">6.6 Octal numbers</a></h3>
+	Numbers can be written in base 8, and must start with number 0:<br />
+	077 == 63<br />
+	If <span class="rword">int</span> type is insufficient to represent the octal constant as a positive number, then the type is <span class="rword">long</span>, otherwise it's <span class="rword">int</span>.<br />
+	If <span class="rword">long</span> type is insufficient to represent the octal constant as a positive number, and then if <span class="rword">int</span> type can represent the octal constant as a negative number, the type is <span class="rword">int</span>, otherwise it's <span class="rword">long</span>.<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="hexnum">6.7 Hexadecimal numbers</a></h3>
+	Numbers can be written in base 16, and must start with '0x':<br />
+	0x80 == 128<br />
+	If <span class="rword">int</span> type is insufficient to represent the hexadecimal constant as a positive number, then the type is <span class="rword">long</span>, otherwise it's <span class="rword">int</span>.<br />
+	If <span class="rword">long</span> type is insufficient to represent the hexadecimal constant as a positive number, and then if <span class="rword">int</span> type can represent the hexadecimal constant as a negative number, the type is <span class="rword">int</span>, otherwise it's <span class="rword">long</span>.<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="nullptr">6.8 Null pointer</a></h3>
+
+	<span class="rword">nullptr</span> acts as a constant of null pointer.<br />
+	<span class="rword">nullptr</span> can be assigned to pointers, arrays with implicit size or functions pointers.<br />
+	<span class="rword">nullptr</span> can be strictly compared (== or !=) with pointers, arrays with implicit size and functions pointers.<br />
+</div>
+<hr />
+
+<h2 align="center">7. Standard library</h2>
+<div class="topic">
+	<h3><a name="std_typeinfo">std.typeinfo</a></h3>
+
+	Global functions.
+
+	<div class="function">
+		<p class="code">
+<span class="rword">int</span> <span class="func">isFunction</span>(<span class="rword">typeid</span> type);<br />
+<span class="rword">int</span> <span class="func">isFunction</span>(<span class="rword">auto ref</span> type);<br />
+		</p>
+		These functions return 1 if <span class="rword">typeid</span> or <span class="rword">auto ref</span> target type is a function type.<br />
+		Otherwise, the return value is 0.<br />
+	</div>
+
+	<div class="function">
+		<p class="code">
+<span class="rword">int</span> <span class="func">isClass</span>(<span class="rword">typeid</span> type);<br />
+<span class="rword">int</span> <span class="func">isClass</span>(<span class="rword">auto ref</span> type);<br />
+		</p>
+		These functions return 1 if <span class="rword">typeid</span> or <span class="rword">auto ref</span> target type is a class.<br />
+		Otherwise, the return value is 0.<br />
+		For <span class="rword">typeid</span>, <span class="rword">auto ref</span>, <span class="rword">auto</span>[] types the return value is also 1.<br />
+	</div>
+
+	<div class="function">
+		<p class="code">
+<span class="rword">int</span> <span class="func">isSimple</span>(<span class="rword">typeid</span> type);<br />
+<span class="rword">int</span> <span class="func">isSimple</span>(<span class="rword">auto ref</span> type);<br />
+		</p>
+		These functions return 1 if <span class="rword">typeid</span> or <span class="rword">auto ref</span> target type is a simple type.<br />
+		Otherwise, the return value is 0.<br />
+		Simple types are: <span class="rword">void</span>, <span class="rword">char</span>, <span class="rword">short</span>, <span class="rword">int</span>, <span class="rword">long</span>, <span class="rword">float</span> and <span class="rword">double</span>.<br />
+	</div>
+
+	<div class="function">
+		<p class="code">
+<span class="rword">int</span> <span class="func">isArray</span>(<span class="rword">typeid</span> type);<br />
+<span class="rword">int</span> <span class="func">isArray</span>(<span class="rword">auto ref</span> type);<br />
+		</p>
+		These functions return 1 if <span class="rword">typeid</span> or <span class="rword">auto ref</span> target type is an array type.<br />
+		Otherwise, the return value is 0.<br />
+		For <span class="rword">auto</span>[] the return value is 0.<br />
+	</div>
+
+	<div class="function">
+		<p class="code">
+<span class="rword">int</span> <span class="func">isPointer</span>(<span class="rword">typeid</span> type);<br />
+<span class="rword">int</span> <span class="func">isPointer</span>(<span class="rword">auto ref</span> type);<br />
+		</p>
+		These functions return 1 if <span class="rword">typeid</span> or <span class="rword">auto ref</span> target type is a pointer type.<br />
+		Otherwise, the return value is 0.<br />
+		For <span class="rword">auto ref</span> the return value is 0.<br />
+	</div>
+
+	<span class="rword">typeid</span> member functions.
+
+	<div class="function">
+		<p class="code"><span class="rword">int</span> <span class="rword">typeid</span>.<span class="func">size</span>();</p>
+		Function returns type size.
+	</div>
+
+	<div class="function">
+		<p class="code"><span class="rword">char</span>[] <span class="rword">typeid</span>.<span class="func">name</span>();</p>
+		Function returns type name.<br />
+	</div>
+
+	Functions to use on class types.
+	<div class="function">
+		<p class="code"><span class="rword">int</span> <span class="rword">typeid</span>:<span class="func">memberCount</span>();</p>
+		Function returns class member count. If type is not a class, runtime error occurs.<br />
+	</div>
+
+	<div class="function">
+		<p class="code"><span class="rword">typeid</span> <span class="rword">typeid</span>:<span class="func">memberType</span>(<span class="rword">int</span> member);</p>
+		Function returns selected class member type. If type is not a class, runtime error occurs.<br />
+	</div>
+
+	<div class="function">
+		<p class="code"><span class="rword">char</span>[] <span class="rword">typeid</span>:<span class="func">memberName</span>(<span class="rword">int</span> member);</p>
+		Function returns selected class member name. If type is not a class, runtime error occurs.<br />
+	</div>
+
+	Functions to use on array and pointer types.
+	<div class="function">
+		<p class="code"><span class="rword">typeid</span> <span class="rword">typeid</span>:<span class="func">subType</span>();</p>
+		Function returns typeid of array element type or pointer target type. If type is not an array or pointer, runtime error occurs.<br />
+	</div>
+
+	Functions to use on array types.
+	<div class="function">
+		<p class="code"><span class="rword">int</span> <span class="rword">typeid</span>:<span class="func">arraySize</span>();</p>
+		Function returns array size. If type is not an array, runtime error occurs.<br />
+		If type is an array with implicit size, the return value is -1.<br />
+	</div>
+
+	Functions to use on function types.
+	<div class="function">
+		<p class="code"><span class="rword">typeid</span> <span class="rword">typeid</span>:<span class="func">returnType</span>();</p>
+		Function returns typeid of function type return type. If type is not a function type, runtime error occurs.<br />
+	</div>
+
+	<div class="function">
+		<p class="code"><span class="rword">int</span> <span class="rword">typeid</span>:<span class="func">argumentCount</span>();</p>
+		Function returns function type argument count. If type is not a function type, runtime error occurs.<br />
+	</div>
+
+	<div class="function">
+		<p class="code"><span class="rword">typeid</span> <span class="rword">typeid</span>:<span class="func">argumentType</span>(<span class="rword">int</span> <span class="rword">argument</span>);</p>
+		Function returns function type argument type for selected argument. If type is not a function type, runtime error occurs.<br />
+	</div>
+
+	<div class="function">
+		<p class="code">
+<span class="rword">class</span> <span class="rword">member_info</span><br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">typeid</span> type;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rword">char</span>[] name;<br />
+}<br />
+		</p>
+	This class contains information that is returned for every class member during iteration over class members.
+	</div>
+	<div class="function">
+		<p class="code"><span class="rword">member_iterator</span> <span class="rword">typeid</span>:<span class="func">members</span>();</p>
+		Function returns iterator over class members to be used in for each expression.<br />
+		If type is not a class, runtime error occurs<br />
+	</div>
+
+	<div class="function">
+		<p class="code">
+<span class="rword">member_iterator ref</span> <span class="rword">member_iterator</span>:<span class="func">start</span>();<br />
+<span class="rword">int</span> <span class="rword">member_iterator</span>:<span class="func">hasnext</span>();<br />
+<span class="rword">member_info</span> <span class="rword">member_iterator</span>:<span class="func">next</span>();<br />
+		</p>
+		These functions implement iteration process.<br />
+		Iterator return value is the <span class="rword">member_info</span> class.<br />
+	</div>
+
+	<div class="function">
+		<p class="code"><span class="rword">argument_iterator</span> <span class="rword">typeid</span>:<span class="func">arguments</span>();</p>
+		Function returns iterator over function type arguments to be used in for each expression.<br />
+		If type is not a function type, runtime error occurs<br />
+	</div>
+
+	<div class="function">
+		<p class="code">
+<span class="rword">argument_iterator ref</span> <span class="rword">argument_iterator</span>:<span class="func">start</span>();<br />
+<span class="rword">int</span> <span class="rword">argument_iterator</span>:<span class="func">hasnext</span>();<br />
+<span class="rword">typeid</span> <span class="rword">argument_iterator</span>:<span class="func">next</span>();<br />
+		</p>
+		These functions implement iteration process.<br />
+		Iterator return value is the <span class="rword">typeid</span> class.<br />
+	</div>
+	
+	<div class="function">
+		<p class="code">
+<span class="rword">auto ref</span>	<span class="func">typeGetMember</span>(<span class="rword">auto ref</span> obj, <span class="rword">int</span> member);<br />
+<span class="rword">auto ref</span>	<span class="func">typeGetMember</span>(<span class="rword">auto ref</span> obj, <span class="rword">char</span>[] name);<br />
+		</p>
+		These functions return pointer to a member of the selected variable. First function accepts member position and the second accepts member name.<br />
+	</div>
+
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="std_dynamic">std.dynamic</a></h3>
+
+	<div class="function">
+		<p class="code">
+<span class="rword">void</span> <span class="func">override</span>(<span class="rword">auto ref</span> a, b);<br />
+		</p>
+		Function accepts two functions as its arguments and replaces code of the first function with the code of the second function.<br />
+		If passed objects are not functions, a runtime error occurs.<br />
+		If function types are different, a runtime error occurs.<br />
+		<div class="example">
+			<p class="example_head" id="override_ex1a" onmousedown="toggleView(&quot;override_ex1a&quot;, &quot;override_ex1b&quot;, &quot;example of override function usage.&quot;);">Show example of override function usage.</p>
+			<p class="code example_body" id="override_ex1b">
+<span class="rword">import</span> <span class="var">std</span>.<span class="var">dynamic</span>;<br />
+<span class="rword">int</span> x, y;<br />
+<br />
+<span class="comment">// define two functions</span><br />
+<span class="rword">int</span> <span class="func">foo</span>(<span class="rword">int</span> x){ <span class="rword">return</span> <span class="var">x</span>; }<br />
+<span class="rword">int</span> <span class="func">bar</span>(<span class="rword">int</span> x){ <span class="rword">return</span> <span class="var">x</span> * <span class="real">2</span>; }<br />
+<br />
+<span class="var">x</span> = <span class="func">foo</span>(<span class="real">5</span>); <span class="comment">// x == 5</span><br />
+<span class="var">y</span> = <span class="func">bar</span>(<span class="real">5</span>); <span class="comment">// y == 10</span><br />
+<br />
+<span class="comment">// Override foo function code with bar</span><br />
+<span class="func">override</span>(<span class="var">foo</span>, <span class="var">bar</span>);<br />
+<br />
+<span class="var">x</span> = <span class="func">foo</span>(<span class="real">5</span>); <span class="comment">// x = 10</span><br />
+<span class="var">y</span> = <span class="func">bar</span>(<span class="real">5</span>); <span class="comment">// y = 10</span><br />
+			</p>
+		</div>
+		<div class="example">
+			<p class="example_head" id="override_ex2a" onmousedown="toggleView(&quot;override_ex2a&quot;, &quot;override_ex2b&quot;, &quot;example of override function usage with inline function definition.&quot;);">Show example of override function usage with inline function definition.</p>
+			<p class="code example_body" id="override_ex2b">
+<span class="rword">import</span> <span class="var">std</span>.<span class="var">dynamic</span>;<br />
+<span class="rword">int</span> x, y;<br />
+<br />
+<span class="comment">// define function</span><br />
+<span class="rword">int</span> <span class="func">foo</span>(<span class="rword">int</span> x){ <span class="rword">return</span> <span class="var">x</span>; }<br />
+<span class="var">x</span> = <span class="func">foo</span>(<span class="real">5</span>); <span class="comment">// x == 5</span><br />
+<br />
+<span class="comment">// Override foo function code with new function</span><br />
+<span class="func">override</span>(<span class="var">foo</span>, <span class="rword">auto</span>(<span class="rword">int</span> x){ <span class="rword">return</span> <span class="var">x</span> * <span class="real">2</span>; });<br />
+<br />
+<span class="var">y</span> = <span class="func">foo</span>(<span class="real">5</span>); <span class="comment">// y = 10</span><br />
+			</p>
+		</div>
+	</div>
+	<div class="function">
+		<p class="code">
+<span class="rword">void</span> <span class="func">override</span>(<span class="rword">auto ref</span> function, <span class="rword">char</span>[] code);<br />
+		</p>
+		Function accepts a function and a new source code for the body of that function as a string.<br />
+		Function compiles the code that replaces code of the destination function. Because code contains only function body, to access function arguments, use name "argN", where N is the argument number, counting from 0.<br />
+		If first argument is not a function, a runtime error occurs.<br />
+		If code compilation fails, a runtime error occurs.<br />
+		<div class="example">
+			<p class="example_head" id="override_ex3a" onmousedown="toggleView(&quot;override_ex3a&quot;, &quot;override_ex3b&quot;, &quot;example of override function usage with inline function definition.&quot;);">Show example of override function usage with inline function definition.</p>
+			<p class="code example_body" id="override_ex3b">
+<span class="rword">import</span> <span class="var">std</span>.<span class="var">dynamic</span>;<br />
+<span class="rword">int</span> x, y;<br />
+<br />
+<span class="comment">// define function</span><br />
+<span class="rword">int</span> <span class="func">foo</span>(<span class="rword">int</span> x){ <span class="rword">return</span> <span class="var">x</span>; }<br />
+<span class="var">x</span> = <span class="func">foo</span>(<span class="real">5</span>); <span class="comment">// x == 5</span><br />
+<br />
+<span class="comment">// Override foo function code with new code</span><br />
+<span class="func">override</span>(<span class="var">foo</span>, "<span class="string">return arg0 * 2;</span>");<br />
+<br />
+<span class="var">y</span> = <span class="func">foo</span>(<span class="real">5</span>); <span class="comment">// y = 10</span><br />
+			</p>
+		</div>
+	</div>
+	<div class="function">
+		<p class="code">
+<span class="rword">void</span> <span class="func">eval</span>(<span class="rword">char</span>[] code);<br />
+		</p>
+		Function compiles the code and executes it.<br />
+		If code compilation fails, a runtime error occurs.<br />
+		<div class="example">
+			<p class="example_head" id="eval_ex1a" onmousedown="toggleView(&quot;eval_ex1a&quot;, &quot;eval_ex1b&quot;, &quot;example of eval function usage.&quot;);">Show example of eval function usage.</p>
+			<p class="code example_body" id="eval_ex1b">
+<span class="rword">import</span> <span class="var">std</span>.<span class="var">dynamic</span>;<br />
+<span class="rword">int</span> x = <span class="real">5</span>;<br />
+<span class="func">eval</span>("<span class="string">x *= 5;</span>"); <span class="comment">// dynamically compile and run code</span><br />
+<span class="rword">return</span> <span class="var">x</span>; <span class="comment">// 25</span><br />
+			</p>
+		</div>
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="std_gc">std.gc</a></h3>
+	<div class="function">
+		<p class="code">
+<span class="rword">void</span> <span class="rword">NamespaceGC</span>:<span class="func">CollectMemory</span>();<br />
+		</p>
+		Function performs on-demand garbage collection.<br />
+	</div>
+	<div class="function">
+		<p class="code">
+<span class="rword">int</span> <span class="rword">NamespaceGC</span>:<span class="func">UsedMemory</span>();<br />
+		</p>
+		Function returns the size of memory currently in use, including memory in use by garbage that is not collected.<br />
+	</div>
+	<div class="function">
+		<p class="code">
+<span class="rword">double</span> <span class="rword">NamespaceGC</span>:<span class="func">MarkTime</span>();<br />
+		</p>
+		Function returns overall time (in seconds) that GC spent to traverse through all objects and mark the used ones.<br />
+	</div>
+	<div class="function">
+		<p class="code">
+<span class="rword">double</span> <span class="rword">NamespaceGC</span>:<span class="func">CollectTime</span>();<br />
+		</p>
+		Function returns overall time (in seconds) that GC spent to free memory used up by garbage.<br />
+	</div>
+	Module contains a global NamespaceStd class instance through which you can call its functions, e.g. GC.CollectMemory().<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="std_vector">std.vector</a></h3>
+
+	std.vector is a generic class that implements a dynamic array holding elements of the specified type T.<br />
+	<div class="function">
+		<pre class="code"><span class="rword">void vector</span><span class="bold">:</span><span class="func">vector</span><span class="bold">();
+</span><span class="rword">void vector</span><span class="bold">:</span><span class="func">vector</span><span class="bold">(</span><span class="rword">int </span><span class="var">reserved</span><span class="bold">);
+</span></pre>
+		Vector provides a default constructor and a constructor for a vector with a number of reserved elements.
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void vector</span><span class="bold">:</span><span class="func">push_back</span><span class="bold">(</span><span class="rword">T </span><span class="var">val</span><span class="bold">);
+</span></pre>
+		Function appends an element to the end of the vector.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void vector</span><span class="bold">:</span><span class="func">pop_back</span><span class="bold">();
+</span></pre>
+		Function removes last element from vector.<br />
+		An error is raised if vector is empty.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">back</span><span class="bold">();
+</span></pre>
+		Function returns the pointer to last element of the vector.<br />
+		An error is raised if vector is empty.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">front</span><span class="bold">();
+</span></pre>
+		Function returns the pointer to first element of the vector.<br />
+		An error is raised if vector is empty.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto operator</span>[]<span class="bold">(</span><span class="rword">vector</span>&lt;<span class="rword">generic</span>&gt; <span class="rword">ref </span><span class="var">v</span>, <span class="rword">int </span><span class="var">index</span><span class="bold">);
+</span></pre>
+		Operator returns element at selected index (counting from 0).<br />
+		An error is raised if vector doesn't contain an element at selected index.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">size</span><span class="bold">();
+</span></pre>
+		Function returns element count inside the vector.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">capacity</span><span class="bold">();
+</span></pre>
+		Function returns how many elements can be placed inside a vector before internal buffer will be reallocated.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void vector</span><span class="bold">:</span><span class="func">reserve</span><span class="bold">(</span><span class="rword">int </span><span class="var">size</span><span class="bold">);
+</span></pre>
+		Function reserves space for a specified amount of elements in an internal buffer.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void vector</span><span class="bold">:</span><span class="func">resize</span><span class="bold">(</span><span class="rword">int </span><span class="var">size</span><span class="bold">);
+</span></pre>
+		Function changes the size of the vector to a specified amount of elements.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void vector</span><span class="bold">:</span><span class="func">clear</span><span class="bold">();
+</span></pre>
+		Function sets the size of the vector to zero, but doesn't free memory used by internal buffer.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void vector</span><span class="bold">:</span><span class="func">destroy</span><span class="bold">();</span></pre>
+		Function sets the size of the vector to zero and frees memory used up by the internal buffer.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">start</span><span class="bold">();
+</span><span class="rword">auto vector_iterator</span><span class="bold">:</span><span class="func">next</span><span class="bold">();
+</span><span class="rword">int vector_iterator</span><span class="bold">:</span><span class="func">hasnext</span><span class="bold">();</span></pre>
+		Vector proved functions for iteration ever elements in a for each expression.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto operator</span>[]<span class="bold">(</span><span class="rword">vector</span>&lt;@<span class="rword">T</span>&gt; <span class="rword">ref </span><span class="var">a</span>, <span class="rword">int </span><span class="var">start</span>, <span class="var">end</span><span class="bold">);
+</span><span class="rword">auto operator</span>[]<span class="bold">(</span><span class="rword">vector_splice</span>&lt;@<span class="rword">T</span>&gt; <span class="rword">ref </span><span class="var">a</span>, <span class="rword">int </span><span class="var">index</span><span class="bold">);</span></pre>
+		You can index a vector with two indexes to create a vector splice: a range of elements that point to vector data.<br />
+		Second operator allow indexing of the created splice.<br />
+	</div>
+	<br />
+	std.vector provides following aggregation functions:
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">sum</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function computes vector element sum by adding numbers returned by a user-specified function. User-specified function is called for every element.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">average</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function computes the average vector elements value by adding numbers returned by a user-specified function and dividing the sum by element count. User-specified function is called for every element.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">min_element</span><span class="bold">();
+</span></pre>
+		This function computes the minimal element of a vector. operator < is required that will take two vector elements for comparison.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">max_element</span><span class="bold">();
+</span></pre>
+		This function computes the maximum element of a vector. operator > is required that will take two vector elements for comparison.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">min_element</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function computes the minimum of the values returned by a user-specified function. User-specified function is called for every element.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">max_element</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function computes the maximum of the values returned by a user-specified function. User-specified function is called for every element.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">count_if</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function returns the element count that satisfies a user-specified function.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">all</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function returns 1 if all of the elements satisfy a user-specified function.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">any</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function returns 1 if any of the elements satisfy a user-specified function.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto vector</span><span class="bold">:</span><span class="func">sort</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>, <span class="rword">T</span>) <span class="var">pred</span><span class="bold">);
+</span></pre>
+		This function sorts the vector with a user-specified function that compares two elements.<br />
+		In order to use this function, you must import std.algorithm module along with std.vector<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">bool operator </span>in<span class="bold">(</span><span class="rword">generic </span><span class="var">x</span>, <span class="rword">vector</span>&lt;<span class="rword">generic</span>&gt; <span class="rword">ref </span><span class="var">arr</span><span class="bold">);</span>
+</pre>
+		This operator returns true if a specified element is a part of vector.<br />
+		operator == that can compare the two elements is required.<br />
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="std_list">std.list</a></h3>
+
+	std.list is a generic class that implements a list of double-linked elements of the specified type T.<br />
+	Some of the std.list functions described below return list_node structure instead of the value. Description of list_node can be found after the std.list function list.<br />
+
+	<div class="function">
+		<pre class="code"><span class="rword">void list</span><span class="bold">:</span><span class="func">list</span><span class="bold">();
+</span></pre>
+		This is std.list default constructor.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void list</span><span class="bold">:</span><span class="func">push_back</span><span class="bold">(</span><span class="rword">T </span><span class="var">elem</span><span class="bold">);
+</span></pre>
+		Function appends an element to the end of the list.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void list</span><span class="bold">:</span><span class="func">push_front</span><span class="bold">(</span><span class="rword">T </span><span class="var">elem</span><span class="bold">);
+</span></pre>
+		Function prepends an element before the beginning of the list.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void list</span><span class="bold">:</span><span class="func">pop_back</span><span class="bold">();
+</span></pre>
+		Function removes the last element from list.<br />
+		An error is raised if list is empty.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void list</span><span class="bold">:</span><span class="func">pop_front</span><span class="bold">();
+</span></pre>
+		Function removes the first element from list.<br />
+		An error is raised if list is empty.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void list</span><span class="bold">:</span><span class="func">insert</span><span class="bold">(</span><span class="rword">list_node</span>&lt;<span class="rword">T</span>&gt; <span class="rword">ref </span><span class="var">it</span>, <span class="rword">T </span><span class="var">elem</span><span class="bold">);
+</span></pre>
+		Function inserts an element <b>after</b> the specified list node.<br />
+		An error is raised if the specified list node is not contained within the list.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void list</span><span class="bold">:</span><span class="func">erase</span><span class="bold">(</span><span class="rword">list_node</span>&lt;<span class="rword">T</span>&gt; <span class="rword">ref </span><span class="var">it</span><span class="bold">);
+</span></pre>
+		Function erases the specified list node.<br />
+		An error is raised if the specified list node is not contained within the list.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void list</span><span class="bold">:</span><span class="func">clear</span><span class="bold">();
+</span></pre>
+		Function removes all elements from the list.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list</span><span class="bold">:</span><span class="func">back</span><span class="bold">();
+</span></pre>
+		Function returns the <b>value</b> of the last list element.<br />
+		An error is raised if list is empty.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list</span><span class="bold">:</span><span class="func">front</span><span class="bold">();
+</span></pre>
+		Function returns the <b>value</b> of the first list element.<br />
+		An error is raised if list is empty.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list</span><span class="bold">:</span><span class="func">begin</span><span class="bold">();
+</span></pre>
+		Function returns first list node.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list</span><span class="bold">:</span><span class="func">end</span><span class="bold">();
+</span></pre>
+		Function returns last list node.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">int list</span><span class="bold">:</span><span class="func">empty</span><span class="bold">();</span></pre>
+		Function returns <span class="real">1</span> is list doesn't contain any elements, otherwise the return value is <span class="real">0</span>.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list_iterator</span><span class="bold">:</span><span class="func">list_iterator</span><span class="bold">(</span><span class="rword">list_node</span>&lt;<span class="rword">T</span>&gt; <span class="rword">ref </span><span class="var">start</span><span class="bold">);
+</span><span class="rword">auto list_iterator</span><span class="bold">:</span><span class="func">start</span><span class="bold">();
+</span><span class="rword">auto list_iterator</span><span class="bold">:</span><span class="func">next</span><span class="bold">();
+</span><span class="rword">auto list_iterator</span><span class="bold">:</span><span class="func">hasnext</span><span class="bold">();
+</span><span class="rword">auto list</span><span class="bold">:</span><span class="func">start</span><span class="bold">();
+</span></pre>
+		These helper functions enable iteration over list elements in for each expression.<br />
+		Iteration can also be started from a specified list node.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list</span><span class="bold">:</span><span class="func">sum</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function computes list element sum by adding numbers returned by a user-specified function. User-specified function is called for every element.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list</span><span class="bold">:</span><span class="func">average</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function computes the average list elements value by adding numbers returned by a user-specified function and dividing the sum by element count. User-specified function is called for every element.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list</span><span class="bold">:</span><span class="func">min_element</span><span class="bold">();
+</span></pre>
+		This function computes the minimal element of a list. operator < is required that will take two vector elements for comparison.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list</span><span class="bold">:</span><span class="func">max_element</span><span class="bold">();
+</span></pre>
+		This function computes the maximum element of a list. operator > is required that will take two vector elements for comparison.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list</span><span class="bold">:</span><span class="func">min_element</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function computes the minimum of the values returned by a user-specified function. User-specified function is called for every element.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list</span><span class="bold">:</span><span class="func">max_element</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function computes the maximum of the values returned by a user-specified function. User-specified function is called for every element.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list</span><span class="bold">:</span><span class="func">count_if</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function returns the element count that satisfies a user-specified function.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list</span><span class="bold">:</span><span class="func">all</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function returns 1 if all of the elements satisfy a user-specified function.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto list</span><span class="bold">:</span><span class="func">any</span><span class="bold">(</span><span class="rword">generic ref</span>(<span class="rword">T</span>) <span class="var">f</span><span class="bold">);
+</span></pre>
+		This function returns 1 if any of the elements satisfy a user-specified function.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">bool operator </span>in<span class="bold">(</span><span class="rword">generic </span><span class="var">x</span>, <span class="rword">list</span>&lt;<span class="rword">generic</span>&gt; <span class="rword">ref </span><span class="var">arr</span><span class="bold">);
+</span></pre>
+		This operator returns true if a specified element is a part of list.<br />
+		operator == that can compare the two elements is required.<br />
+	</div>
+
+	Some functions return a list_node class. This is a class that has references to previous and next node, element value and parent list.<br />
+	An accessors named <b>prev</b>, <b>next</b> and <b>elem</b> are provided to let user get pointer to previous or next node and to retrieve the node value.<br />
+	You can use <b>prev</b> and <b>next</b> to iterate through list nodes.<br />
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="std_hashmap">std.hashmap</a></h3>
+	
+	std.hashmap is a dictionary of key-value elements.<br />
+	An <span class="rword">int </span><span class="func">hash_value</span><span class="bold">(</span><span class="rword">Key_Type </span><span class="var">key</span><span class="bold">)</span>; function is required to use a type as a key if the default constructor is used.<br />
+	A hash_value function for char[] type is provided by default.<br />
+	<div class="function">
+		<pre class="code"><span class="rword">void hashmap</span><span class="bold">:</span><span class="func">hashmap</span><span class="bold">();
+</span><span class="rword">void hashmap</span><span class="bold">:</span><span class="func">hashmap</span><span class="bold">(</span><span class="rword">int ref</span>(<span class="rword">Key</span>) <span class="var">compute_hash</span><span class="bold">);
+</span></pre>
+		A defualt constructor and a constructor that takes a function that computes the hash value are provided.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void hashmap</span><span class="bold">:</span><span class="func">clear</span><span class="bold">();
+</span></pre>
+		Function removes all hashmap elements.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto operator</span>[]<span class="bold">(</span><span class="rword">hashmap</span>&lt;@<span class="rword">K</span>, @<span class="rword">V</span>&gt; <span class="rword">ref </span><span class="var">m</span>, <span class="rword">typeof</span>(<span class="var">m</span>).<span class="rword">target</span>.<span class="rword">Key </span><span class="var">key</span><span class="bold">);
+</span></pre>
+		Operator allows to retrieve or assing a value to an element with the specified key.<br />
+		If an element doesn't exist, it is created.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void hashmap</span><span class="bold">:</span><span class="func">remove</span><span class="bold">(</span><span class="rword">Key </span><span class="var">key</span><span class="bold">);
+</span></pre>
+		Function removes an element with the specified key from hashmap.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">auto hashmap</span><span class="bold">:</span><span class="func">find</span><span class="bold">(</span><span class="rword">Key </span><span class="var">key</span><span class="bold">);
+</span></pre>
+		Function allows to find an element using the key in the hashmap.<br />
+		nullptr is returned if the element doesn't exist.<br />
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="std_range">std.range</a></h3>
+
+	<div class="function">
+		<p class="code">
+<span class="rword">range_iterator</span> <span class="func">range</span>(<span class="rword">int</span> min, max, step = <span class="real">1</span>);<br />
+		</p>
+		Function return range iterator to be used in a for each expression.<br />
+		It will generate number starting from <span class="var">min</span>, incrementing it by a selected step (1 by default) while it's less than max.<br />
+		For example, range(1, 5) iterator will generate numbers {1, 2, 3, 4, 5}.<br />
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="std_file">std.file</a></h3>
+
+	<div class="function">
+		<pre class="code"><span class="rword">File </span><span class="func">File</span><span class="bold">();
+</span><span class="rword">File </span><span class="func">File</span><span class="bold">(</span><span class="rword">char</span>[] <span class="var">name</span>, <span class="rword">char</span>[] <span class="var">access</span><span class="bold">);
+</span></pre>
+		Two static constructors are available to create a file instance or to create a file instance with specified file opened with a specified mode.<br />
+		Modes are equal to the modes of fopen function in C.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void File</span><span class="bold">:</span><span class="func">Open</span><span class="bold">(</span><span class="rword">char</span>[] <span class="var">name</span>, <span class="rword">char</span>[] <span class="var">access</span><span class="bold">);
+</span></pre>
+		Function openes the file with a specified mode.<br />
+		Modes are equal to the modes of fopen function in C.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void File</span><span class="bold">:</span><span class="func">Close</span><span class="bold">();
+</span></pre>
+		Function closes the file.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">int File</span><span class="bold">:</span><span class="func">Opened</span><span class="bold">();
+</span></pre>
+		Function returns 1 if file is opened and 0 otherwise.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">enum Seek
+</span>{
+<span class="func">    </span><span class="vardef">SET</span>,
+<span class="func">    </span><span class="vardef">CUR</span>,
+    <span class="vardef">END
+</span>}
+<span class="rword">void File</span><span class="bold">:</span><span class="func">Seek</span><span class="bold">(</span><span class="rword">Seek </span><span class="var">origin</span>, <span class="rword">int </span><span class="var">shift </span>= <span class="real">0</span><span class="bold">);
+</span></pre>
+		Function allows to seek in the file with one of the seek options specified by enumeration value.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">long File</span><span class="bold">:</span><span class="func">Tell</span><span class="bold">();
+</span></pre>
+		Function returns cursor position in the file.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">long File</span><span class="bold">:</span><span class="func">Size</span><span class="bold">();
+</span></pre>
+		Function returns the size of the file.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void File</span><span class="bold">:</span><span class="func">Write</span><span class="bold">(</span><span class="rword">char </span><span class="var">data</span><span class="bold">);
+</span><span class="rword">void File</span><span class="bold">:</span><span class="func">Write</span><span class="bold">(</span><span class="rword">short </span><span class="var">data</span><span class="bold">);
+</span><span class="rword">void File</span><span class="bold">:</span><span class="func">Write</span><span class="bold">(</span><span class="rword">int </span><span class="var">data</span><span class="bold">);
+</span><span class="rword">void File</span><span class="bold">:</span><span class="func">Write</span><span class="bold">(</span><span class="rword">long </span><span class="var">data</span><span class="bold">);
+</span><span class="rword">void File</span><span class="bold">:</span><span class="func">Write</span><span class="bold">(</span><span class="rword">float </span><span class="var">data</span><span class="bold">);
+</span><span class="rword">void File</span><span class="bold">:</span><span class="func">Write</span><span class="bold">(</span><span class="rword">double </span><span class="var">data</span><span class="bold">);
+</span></pre>
+		These functions write the argument values into the file.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void File</span><span class="bold">:</span><span class="func">Read</span><span class="bold">(</span><span class="rword">char ref </span><span class="var">data</span><span class="bold">);
+</span><span class="rword">void File</span><span class="bold">:</span><span class="func">Read</span><span class="bold">(</span><span class="rword">short ref </span><span class="var">data</span><span class="bold">);
+</span><span class="rword">void File</span><span class="bold">:</span><span class="func">Read</span><span class="bold">(</span><span class="rword">int ref </span><span class="var">data</span><span class="bold">);
+</span><span class="rword">void File</span><span class="bold">:</span><span class="func">Read</span><span class="bold">(</span><span class="rword">long ref </span><span class="var">data</span><span class="bold">);
+</span><span class="rword">void File</span><span class="bold">:</span><span class="func">Read</span><span class="bold">(</span><span class="rword">float ref </span><span class="var">data</span><span class="bold">);
+</span><span class="rword">void File</span><span class="bold">:</span><span class="func">Read</span><span class="bold">(</span><span class="rword">double ref </span><span class="var">data</span><span class="bold">);
+</span></pre>
+		These function read values from file into the arguments.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void File</span><span class="bold">:</span><span class="func">Read</span><span class="bold">(</span><span class="rword">char</span>[] <span class="var">arr</span><span class="bold">);
+</span></pre>
+		Function reads arr.size bytes from file into the specified array.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void File</span><span class="bold">:</span><span class="func">Write</span><span class="bold">(</span><span class="rword">char</span>[] <span class="var">arr</span><span class="bold">);
+</span></pre>
+		Function writes arr.size bytes from specified array into the file.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void File</span><span class="bold">:</span><span class="func">Print</span><span class="bold">(</span><span class="rword">char</span>[] <span class="var">arr</span><span class="bold">);
+</span></pre>
+		Function writes data from array until 0-terminator.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void File</span><span class="bold">:</span><span class="func">Read</span><span class="bold">(</span><span class="rword">char</span>[] <span class="var">arr</span>, <span class="rword">int </span><span class="var">offset</span>, <span class="rword">int </span><span class="var">bytes</span><span class="bold">);
+</span></pre>
+		Function reads specified amount of bytes from file into the array with the specified offset from the start.<br />
+		Array must be able to hold the specified amount of bytes from the specified offset.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void File</span><span class="bold">:</span><span class="func">Write</span><span class="bold">(</span><span class="rword">char</span>[] <span class="var">arr</span>, <span class="rword">int </span><span class="var">offset</span>, <span class="rword">int </span><span class="var">bytes</span><span class="bold">);
+</span></pre>
+		Function writes specified amount of bytes from array with the specified offset from the start into the file.<br />
+		Array must have the specified amount of bytes from the specified offset.<br />
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="std_io">std.io</a></h3>
+
+	<div class="function">
+		<pre class="code"><span class="rword">void </span><span class="func">Print</span><span class="bold">(</span><span class="rword">char</span>[] <span class="var">text</span><span class="bold">);
+</span><span class="rword">void </span><span class="func">Print</span><span class="bold">(</span><span class="rword">int </span><span class="var">num</span>, <span class="rword">int </span><span class="var">base </span>= <span class="real">10</span><span class="bold">);
+</span><span class="rword">void </span><span class="func">Print</span><span class="bold">(</span><span class="rword">double </span><span class="var">num</span><span class="bold">);
+</span><span class="rword">void </span><span class="func">Print</span><span class="bold">(</span><span class="rword">long </span><span class="var">num</span>, <span class="rword">int </span><span class="var">base </span>= <span class="real">10</span><span class="bold">);
+</span><span class="rword">void </span><span class="func">Print</span><span class="bold">(</span><span class="rword">char </span><span class="var">ch</span><span class="bold">);
+</span></pre>
+		These functions print a string, an integer in a specified base, a double, a long in a specified base and a single character to the console window.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">int </span><span class="func">Input</span><span class="bold">(</span><span class="rword">char</span>[] <span class="var">buf</span><span class="bold">);
+</span></pre>
+		Function reads a user string into an array.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void </span><span class="func">Input</span><span class="bold">(</span><span class="rword">int ref </span><span class="var">num</span><span class="bold">);
+</span></pre>
+		Function reads a number from user string into the int.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void </span><span class="func">Write</span><span class="bold">(</span><span class="rword">char</span>[] <span class="var">buf</span><span class="bold">);
+</span></pre>
+		Function outputs the whole buffer without stopping at 0-bytes.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void </span><span class="func">SetConsoleCursorPos</span><span class="bold">(</span><span class="rword">int </span><span class="var">x</span>, <span class="var">y</span><span class="bold">);
+</span></pre>
+		This function sets the console cursor position to the specified location. (Windows-only)<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void </span><span class="func">GetKeyboardState</span><span class="bold">(</span><span class="rword">char</span>[] <span class="var">state</span><span class="bold">);
+</span></pre>
+		This function writes the keyboard and mouse key state into an array. (Windows-only)<br />
+		It works just like GetKeyboardState function in WinAPI.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">void </span><span class="func">GetMouseState</span><span class="bold">(</span><span class="rword">int ref </span><span class="var">x</span>, <span class="rword">int ref </span><span class="var">y</span><span class="bold">);
+</span></pre>
+		Function writes mouse position into the passed arguments. (Windows-only)<br />
+		It works just like GetCursorPos function in WinAPI.<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">bool </span><span class="func">IsPressed</span><span class="bold">(</span><span class="rword">VK</span> <span class="var">key</span><span class="bold">);
+</span><span class="rword">bool </span><span class="func">IsPressed</span><span class="bold">(</span><span class="rword">char</span> <span class="var">key</span><span class="bold">);
+</span></pre>
+		Function returns true if a key specified by its virtual key code (VK enumeration values: for example, VK.F12) or by a character  code (only numbers from 0-9 and upper case characters) is pressed. (Windows-only)<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">bool </span><span class="func">IsToggled</span><span class="bold">(</span><span class="rword">VK</span> <span class="var">key</span><span class="bold">);
+</span><span class="rword">bool </span><span class="func">IsToggled</span><span class="bold">(</span><span class="rword">char</span> <span class="var">key</span><span class="bold">);
+</span></pre>
+		Function returns true if a key specified by its virtual key code (VK enumeration values: for example, VK.F12) or by a character  code (only numbers from 0-9 and upper case characters) is toggled. (Windows-only)<br />
+	</div>
+	<div class="function">
+		<pre class="code"><span class="rword">StdOut operator </span>&lt;&lt;<span class="bold">(</span><span class="rword">StdOut </span><span class="var">out</span>, <span class="rword">char</span>[] <span class="rword">ref</span>(<span class="rword">StdNonTerminatedTag</span>) <span class="var">wrapper</span><span class="bold">);
+</span><span class="rword">StdOut operator </span>&lt;&lt;<span class="bold">(</span><span class="rword">StdOut </span><span class="var">out</span>, <span class="rword">char</span>[] <span class="var">str</span><span class="bold">);
+</span><span class="rword">StdOut operator </span>&lt;&lt;<span class="bold">(</span><span class="rword">StdOut </span><span class="var">out</span>, <span class="rword">const_string </span><span class="var">str</span><span class="bold">);
+</span><span class="rword">StdOut operator </span>&lt;&lt;<span class="bold">(</span><span class="rword">StdOut </span><span class="var">out</span>, <span class="rword">StdEndline </span><span class="var">str</span><span class="bold">);
+</span><span class="rword">StdOut operator </span>&lt;&lt;<span class="bold">(</span><span class="rword">StdOut </span><span class="var">out</span>, <span class="rword">bool </span><span class="var">num</span><span class="bold">);
+</span><span class="rword">StdOut operator </span>&lt;&lt;<span class="bold">(</span><span class="rword">StdOut </span><span class="var">out</span>, <span class="rword">char </span><span class="var">ch</span><span class="bold">);
+</span><span class="rword">StdOut operator </span>&lt;&lt;<span class="bold">(</span><span class="rword">StdOut </span><span class="var">out</span>, <span class="rword">short </span><span class="var">num</span><span class="bold">);
+</span><span class="rword">StdOut operator </span>&lt;&lt;<span class="bold">(</span><span class="rword">StdOut </span><span class="var">out</span>, <span class="rword">int </span><span class="var">num</span><span class="bold">);
+</span><span class="rword">StdOut operator </span>&lt;&lt;<span class="bold">(</span><span class="rword">StdOut </span><span class="var">out</span>, <span class="rword">float </span><span class="var">num</span><span class="bold">);
+</span><span class="rword">StdOut operator </span>&lt;&lt;<span class="bold">(</span><span class="rword">StdOut </span><span class="var">out</span>, <span class="rword">double </span><span class="var">num</span><span class="bold">);
+</span><span class="rword">StdOut operator </span>&lt;&lt;<span class="bold">(</span><span class="rword">StdOut </span><span class="var">out</span>, <span class="rword">long </span><span class="var">num</span><span class="bold">);
+</span></pre>
+		This set of operators exists to make stream output similar to std::cout in C++.<br />
+		You have a global StdOut instance to use in output operations: io.out.<br />
+		To output a number or string, write:
+		<pre class="code"><span class="var">io</span>.<span class="var">out </span>&lt;&lt; "<span class="string">The number is </span>" &lt;&lt; <span class="real">4 </span>&lt;&lt; <span class="var">io</span>.<span class="var">endl</span>;</pre>
+		To print a newline, use io.endl as in an example above.<br />
+		To change number base, output one of the following modificators: io.bin, io.oct, io.dec, io.hex of io.base(base).<br />
+		To print a character array that doesn't end with a 0-terminator, output io.non_terminated(array).<br />
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="std_random">std.random</a></h3>
+
+	<div class="function">
+		<p class="code">
+<span class="rword">void</span> <span class="func">srand</span>(<span class="rword">int</span> seed);<br />
+		</p>
+		Sets a random starting point.<br />
+	</div>
+	<div class="function">
+		<p class="code">
+<span class="rword">int</span> <span class="func">rand</span>();<br />
+		</p>
+		Generates a pseudorandom number (in a range from 0 to 32767).<br />
+	</div>
+	<div class="function">
+		<p class="code">
+<span class="rword">int</span> <span class="func">rand</span>(<span class="rword">int</span> max);<br />
+		</p>
+		Generates a pseudorandom number with a specified maximum (it must be less than 32767).<br />
+	</div>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="std_time">std.time</a></h3>
+
+	<div class="function">
+		<p class="code">
+<span class="rword">int</span> <span class="func">clock</span>();<br />
+		</p>
+		Function returns the elapsed wall-clock time since the start of the process (in milliseconds).<br />
+	</div>
+</div>
+<hr />
+
+<h2 align="center">8. Appendix</h2>
+
+<div class="topic">
+	<h3><a name="convrules">8.1 Rules applied to value types in a binary operation</a></h3>
+
+	Rule A:<br />
+	Operations are made on three types: double, long and int.<br />
+	Because of this, different types are converted to these three types:<br />
+	<ul>
+		<li>char -> int</li>
+		<li>short -> int</li>
+		<li>float -> double</li>
+	</ul>
+
+	Rule B:<br />
+	If a binary operation is done on two different types, arguments are converted in a following fashion:<br />
+	<ul>
+		<li>int * double -> double * double</li>
+		<li>long * double -> double * double</li>
+		<li>int * long -> long * long</li>
+	</ul>
+	This is done after applying "Rule A"<br />
+	<br />
+	Rule C:<br />
+	In variable modification expression (+=, -=, *=, /=, **=, %=, <<=, >>=, &=, |=, ^=) binary operation is performed as described in "Rule B",<br />
+	And result is converted to type of l-value.<br />
+	<p class="code">
+		<span class="rword">int</span> a = <span class="real">2</span>;<br />
+		a *= <span class="real">2.5</span>; <span class="comment">// a equals 5</span><br />
+	</p>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="oppriority">8.2 Operator priority</a></h3>
+
+	<table border="1px">
+		<tr><th>#</th><th>Evaluation</th><th>Operation</th></tr>
+		<tr><td>1</td><td>left-to-right</td><td>* (unary)</td></tr>
+		<tr><td>2</td><td>left-to-right</td><td>. []</td></tr>
+		<tr><td>3</td><td>left-to-right</td><td>& (unary) + (unary) - (unary) ~ ! ++ (prefix) -- (prefix)</td></tr>
+		<tr><td>4</td><td>left-to-right</td><td>++ (postfix) -- (postfix)</td></tr>
+		<tr><td>5</td><td>left-to-right</td><td>**</td></tr>
+		<tr><td>6</td><td>left-to-right</td><td>/ * %</td></tr>
+		<tr><td>7</td><td>left-to-right</td><td>+ -</td></tr>
+		<tr><td>8</td><td>left-to-right</td><td><< >></td></tr>
+		<tr><td>9</td><td>left-to-right</td><td>< <= > >=</td></tr>
+		<tr><td>10</td><td>left-to-right</td><td>== !=</td></tr>
+		<tr><td>11</td><td>left-to-right</td><td>&</td></tr>
+		<tr><td>12</td><td>left-to-right</td><td>^</td></tr>
+		<tr><td>13</td><td>left-to-right</td><td>|</td></tr>
+		<tr><td>14</td><td>left-to-right</td><td>&&</td></tr>
+		<tr><td>15</td><td>left-to-right</td><td>^^</td></tr>
+		<tr><td>16</td><td>left-to-right</td><td>||</td></tr>
+		<tr><td>17</td><td>left-to-right</td><td>?:</td></tr>
+		<tr><td>18</td><td>right-to-left</td><td>= += -= *= /= **= %= <<= >>= &= |= ^=</td></tr>
+	</table>
+</div>
+<hr />
+<div class="topic">
+	<h3><a name="convimplicit">8.3 Implicit conversions</a></h3>
+
+	Apart from implicit conversions from one basic type to the other, there are following implicit conversions between complex types:<br />
+	<p class="code">
+		<span class="rword">type</span>[<span class="real">N</span>] -> <span class="rword">type</span>[]<br />
+		<span class="rword">type</span>[<span class="real">N</span>] ref -> <span class="rword">type</span>[] ref<br />
+		<span class="rword">type</span> -> <span class="rword">auto ref</span> <span class="comment">// only in function argument list</span><br />
+		<span class="rword">type ref</span> -> <span class="rword">auto ref</span><br />
+		<span class="rword">auto ref</span> -> <span class="rword">type ref</span> <span class="comment">// <b>except</b> for function argument list</span><br />
+		<span class="rword">type</span>[<span class="real">N</span>] -> <span class="rword">auto</span>[] <span class="comment">// only in function argument list</span><br />
+		<span class="rword">type</span>[] -> <span class="rword">auto</span>[] <span class="comment">// only in function argument list</span><br />
+	</p>
+</div>
+<hr />
+	</body>
+</html>
